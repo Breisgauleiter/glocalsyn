@@ -9,6 +9,7 @@ import { Hubs } from './routes/Hubs';
 import { Me } from './routes/Me';
 import { Login } from './features/auth/Login';
 import { ProfileWizard } from './features/profile/ProfileWizard';
+import './styles/global.css';
 
 const router = createBrowserRouter([
   {

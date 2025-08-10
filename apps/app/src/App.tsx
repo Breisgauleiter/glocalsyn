@@ -1,19 +1,32 @@
 import React from 'react';
 import { Outlet, NavLink } from 'react-router-dom';
+import { Background } from './components/Background';
 
 export function App() {
   return (
-    <div style={{ minHeight: '100dvh', display: 'flex', flexDirection: 'column' }}>
-      <main style={{ flex: 1 }}>
+    <div className="app-shell">
+      <Background />
+      <header className="app-header glass-surface glass-header" role="banner">
+        <strong>Syntopia</strong>
+        <nav aria-label="Sekundärnavigation">
+          {/* ... could add language toggle or help later ... */}
+        </nav>
+      </header>
+      <main className="app-main">
         <Outlet />
       </main>
-      <nav aria-label="Hauptnavigation" style={{ borderTop: '1px solid #e5e7eb' }}>
-        <ul style={{ display: 'flex', margin: 0, padding: '8px 0', listStyle: 'none', justifyContent: 'space-around' }}>
-          <li><NavLink to="/" aria-label="Home">Home</NavLink></li>
-          <li><NavLink to="/quests" aria-label="Quests">Quests</NavLink></li>
-          <li><NavLink to="/map" aria-label="Karte">Map</NavLink></li>
-          <li><NavLink to="/hubs" aria-label="Hubs">Hubs</NavLink></li>
-          <li><NavLink to="/me" aria-label="Ich">Ich</NavLink></li>
+      <footer className="footer glass-surface glass-footer" aria-hidden>
+        <div className="horizon" />
+        <img className="tree" src={new URL('./assets/tree.svg', import.meta.url).toString()} alt="" />
+        <small>Made with care • Syntopia</small>
+      </footer>
+      <nav aria-label="Hauptnavigation" className="app-nav glass-surface">
+        <ul className="app-tabs">
+          <li><NavLink to="/" aria-label="Home" className={({ isActive }) => isActive ? 'active' : undefined}>Home</NavLink></li>
+          <li><NavLink to="/quests" aria-label="Quests" className={({ isActive }) => isActive ? 'active' : undefined}>Quests</NavLink></li>
+          <li><NavLink to="/map" aria-label="Karte" className={({ isActive }) => isActive ? 'active' : undefined}>Map</NavLink></li>
+          <li><NavLink to="/hubs" aria-label="Hubs" className={({ isActive }) => isActive ? 'active' : undefined}>Hubs</NavLink></li>
+          <li><NavLink to="/me" aria-label="Ich" className={({ isActive }) => isActive ? 'active' : undefined}>Ich</NavLink></li>
         </ul>
       </nav>
     </div>

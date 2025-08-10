@@ -7,7 +7,7 @@ export function Quests() {
     <section aria-labelledby="quests-title" style={{ padding: 16 }}>
       <h1 id="quests-title">Quests</h1>
       <p>Hier findest du deine Mini‑Quests.</p>
-      <article aria-labelledby="dummy-quest-title" aria-describedby="dummy-quest-desc" style={{ border: '1px solid #e5e7eb', padding: 12, borderRadius: 8 }}>
+      <article aria-labelledby="dummy-quest-title" aria-describedby="dummy-quest-desc" className="glass-card">
         <h2 id="dummy-quest-title">Dummy‑Quest: Begrüße deinen Hub</h2>
         <p id="dummy-quest-desc">Sag Hallo im lokalen Hub‑Channel. Dauer: 1 Minute.</p>
         {status === 'available' && (
