@@ -7,8 +7,8 @@
 **Ziel**: Installierbare PWA-Shell mit Basic-Identity und Dummy-Quest
 
 #### Deliverables
-- PWA-Shell mit Tab-Navigation (Home, Quests, Map, Hubs, Ich)
-- Login-Flow + minimaler Profilwizard
+- PWA-Shell mit Tab-Navigation (Home, Quests, Map, Hubs, Ich) – [DELIVERED: PR 2 App-Shell]
+- Login-Flow + minimaler Profilwizard – [IN PROGRESS: PR 3]
 - Eine funktionsfähige Dummy-Quest (Client-seitig)
 - Basis-Tests und Dokumentation
 - Klarstellung: Sacred Geometry nur als Design-System (keine Gameplay-Features)
