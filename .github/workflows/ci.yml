@@ -6,7 +6,7 @@ on:
     branches: [ main ]
 
 jobs:
-  build:
+  build-and-test:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -21,3 +21,9 @@ jobs:
         run: pnpm install --frozen-lockfile=false
       - name: Build
         run: pnpm build
+      - name: Unit tests (Vitest)
+        run: pnpm --filter @syntopia/app test
+      - name: Install Playwright browsers
+        run: pnpm --filter @syntopia/app e2e:install
+      - name: E2E tests (Playwright)
+        run: pnpm --filter @syntopia/app e2e
