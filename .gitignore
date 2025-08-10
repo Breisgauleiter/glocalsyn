@@ -1,0 +1,8 @@
+node_modules
+.dist
+build
+dist
+pnpm-lock.yaml
+.vscode
+.DS_Store
+coverage
