@@ -10,7 +10,8 @@
 - PWA-Shell mit Tab-Navigation (Home, Quests, Map, Hubs, Ich) – [DELIVERED: App-Shell]
 - Login-Flow + minimaler Profilwizard – [IN PROGRESS]
 - Eine funktionsfähige Dummy-Quest (Client-seitig) – [DELIVERED]
-- Basis-Tests und Dokumentation – [PENDING]
+- Tests: E2E Happy Path – [DELIVERED]; Unit-Tests – [PENDING]
+- Dokumentation: „How to run & test“ – [DELIVERED]
 - Klarstellung: Sacred Geometry nur als Design-System (keine Gameplay-Features)
 
 ### Sprint 02 – Quests V1
