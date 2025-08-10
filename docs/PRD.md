@@ -53,6 +53,11 @@ Syntopia ist ein mobile-first, kooperatives Real-World-Aufbauspiel, das Menschen
   12) Code Maintainer – Reviews/CI/Tests (no GPL/AGPL)
 - Rechte/Workflows: Jede Rolle hat klar abgegrenzte Verantwortungen, Audit-Log und einfache Eskalation (Review‑Queues).
 
+### Langzeitvision: GitHub-Integration ab SCL ≥ 4
+- Ab SCL 4 werden Quests aus echten GitHub‑Issues generiert (Feature/Fix), aus Repositories, die Nutzer verknüpfen.
+- Letzte Quest vor Aufstieg zu SCL 4: Verknüpfe dein Syntopia‑Profil mit einem GitHub‑Repository (Opt‑in, transparent).
+- Sichtbarkeit: Klarer Hinweis, welche Quests aus welchem Repo stammen und warum sie vorgeschlagen werden.
+
 ### Nicht-Ziele / Abgrenzung
 - Sacred Geometry wird ausschließlich als visuelles Design‑System (Proportionen/Assets) genutzt – kein Gameplay‑Feature.
 - Kein Vendor-Lock; keine proprietären Cloud-Abhängigkeiten im Kern.

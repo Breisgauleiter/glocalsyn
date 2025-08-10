@@ -7,10 +7,10 @@
 **Ziel**: Installierbare PWA-Shell mit Basic-Identity und Dummy-Quest
 
 #### Deliverables
-- PWA-Shell mit Tab-Navigation (Home, Quests, Map, Hubs, Ich) – [DELIVERED: PR 2 App-Shell]
-- Login-Flow + minimaler Profilwizard – [IN PROGRESS: PR 3]
-- Eine funktionsfähige Dummy-Quest (Client-seitig)
-- Basis-Tests und Dokumentation
+- PWA-Shell mit Tab-Navigation (Home, Quests, Map, Hubs, Ich) – [DELIVERED: App-Shell]
+- Login-Flow + minimaler Profilwizard – [IN PROGRESS]
+- Eine funktionsfähige Dummy-Quest (Client-seitig) – [DELIVERED]
+- Basis-Tests und Dokumentation – [PENDING]
 - Klarstellung: Sacred Geometry nur als Design-System (keine Gameplay-Features)
 
 ### Sprint 02 – Quests V1
@@ -33,6 +33,8 @@
 - Erklärbare Empfehlungslogik ("Warum sehe ich das?")
 - Brücken-Quest-Priorisierung
 - Graph-basierte Vielfaltsmechaniken
+- Start: GitHub‑Quests (SCL ≥ 4) – Account‑Link Flow (Opt‑in) + Quest‑Source‑Adapter (GitHub Issues, read‑only)
+- Aufstiegs‑Quest zu SCL 4 vorbereitet (Repo‑Verknüpfung als Quest)
 
 ## Phase 2: Community Features (Sprints 4-6)
 
@@ -70,6 +72,11 @@
 - A/B-Testing Framework
 - Onboarding-Optimierung
 - Community Ops Playbooks für 12 Rollen (How‑to, Checklisten)
+
+## Langzeitvision: GitHub‑Quests ab SCL ≥ 4
+- Start ab Sprint 03: Quests aus echten GitHub‑Issues (Feature/Fix) – zunächst read‑only Adapter + Account‑Link Flow.
+- Aufstiegs‑Quest zu SCL 4: Verknüpfe dein Syntopia‑Profil mit einem GitHub‑Repository (Opt‑in, transparent, widerrufbar).
+- Erklärbarkeit: Anzeige der Quelle (Repo/Issue) und des Grundes für die Empfehlung.
 
 ## Meilensteine
 - **M1** (Ende Sprint 3): MVP lauffähig, erste 100 Beta-Tester
