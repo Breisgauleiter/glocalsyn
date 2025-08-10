@@ -14,8 +14,8 @@ export function Login() {
   }
 
   return (
-    <form onSubmit={onSubmit} aria-labelledby="login-title" style={{ padding: 16 }}>
-      <h1 id="login-title">Login</h1>
+    <form onSubmit={onSubmit} aria-labelledby="login-title" className="container stack glass-card" role="form">
+      <h1 id="login-title" className="h1">Login</h1>
       <label htmlFor="name">Name</label>
       <input
         id="name"
@@ -24,9 +24,10 @@ export function Login() {
         onChange={(e) => setName(e.currentTarget.value)}
         placeholder=""
         aria-describedby="name-hint"
+        className="input"
       />
-      <div id="name-hint">Kurzer Name, keine Sonderzeichen.</div>
-      <button type="submit">Weiter</button>
+      <div id="name-hint" className="p">Kurzer Name, keine Sonderzeichen.</div>
+      <button type="submit" className="btn btn-primary">Weiter</button>
     </form>
   );
 }
