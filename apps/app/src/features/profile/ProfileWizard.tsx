@@ -13,11 +13,11 @@ export function ProfileWizard() {
   }
 
   return (
-    <form onSubmit={onSubmit} aria-labelledby="wizard-title" style={{ padding: 16 }}>
-      <h1 id="wizard-title">Profil</h1>
+    <form onSubmit={onSubmit} aria-labelledby="wizard-title" className="container stack glass-card" role="form">
+      <h1 id="wizard-title" className="h1">Profil</h1>
       <label htmlFor="region">Region</label>
-      <input id="region" name="region" value={region} onChange={(e) => setRegion(e.currentTarget.value)} />
-      <button type="submit">Fertig</button>
+      <input id="region" name="region" value={region} onChange={(e) => setRegion(e.currentTarget.value)} className="input" />
+      <button type="submit" className="btn btn-primary">Fertig</button>
     </form>
   );
 }

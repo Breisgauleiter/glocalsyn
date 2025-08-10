@@ -17,7 +17,7 @@ export function App() {
       </main>
       <footer className="footer glass-surface glass-footer" aria-hidden>
         <div className="horizon" />
-        <img className="tree" src={new URL('./assets/tree.svg', import.meta.url).toString()} alt="" />
+        <img className="tree" src={new URL('./assets/tree.png', import.meta.url).toString()} alt="" />
         <small>Made with care • Syntopia</small>
       </footer>
       <nav aria-label="Hauptnavigation" className="app-nav glass-surface">
