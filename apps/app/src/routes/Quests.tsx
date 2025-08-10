@@ -12,10 +12,10 @@ export function Quests() {
           <h2 id={`quest-title-${q.id}`} className="h1">{q.title}</h2>
           <p id={`quest-desc-${q.id}`} className="p">{q.description}</p>
           {status(q.id) === 'available' && (
-            <button className="btn btn-primary" aria-label="Quest annehmen" onClick={() => accept(q.id)}>Annehmen</button>
+            <button type="button" className="btn btn-primary" aria-label="Quest annehmen" onClick={() => accept(q.id)}>Annehmen</button>
           )}
           {status(q.id) === 'accepted' && (
-            <button className="btn btn-primary" aria-label="Quest als erledigt markieren" onClick={() => complete(q.id)}>Erledigt</button>
+            <button type="button" className="btn btn-primary" aria-label="Quest als erledigt markieren" onClick={() => complete(q.id)}>Erledigt</button>
           )}
           {status(q.id) === 'done' && <p role="status">Erledigt! 🎉</p>}
         </article>

@@ -5,6 +5,8 @@ import { Background } from './components/Background';
 export function App() {
   return (
     <div className="app-shell">
+      {/* Skip link for keyboard users */}
+      <a href="#main-content" className="skip-link">Zum Inhalt springen</a>
       <Background />
       <header className="app-header glass-surface glass-header" role="banner">
         <strong>Syntopia</strong>
@@ -12,7 +14,7 @@ export function App() {
           {/* ... could add language toggle or help later ... */}
         </nav>
       </header>
-      <main className="app-main">
+      <main id="main-content" className="app-main">
         <Outlet />
       </main>
       <footer className="footer glass-surface glass-footer" aria-hidden>
