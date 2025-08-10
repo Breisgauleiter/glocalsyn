@@ -7,6 +7,8 @@ import { Quests } from './routes/Quests';
 import { Map } from './routes/Map';
 import { Hubs } from './routes/Hubs';
 import { Me } from './routes/Me';
+import { Login } from './features/auth/Login';
+import { ProfileWizard } from './features/profile/ProfileWizard';
 
 const router = createBrowserRouter([
   {
@@ -14,6 +16,8 @@ const router = createBrowserRouter([
     element: <App />,
     children: [
       { index: true, element: <Home /> },
+      { path: 'login', element: <Login /> },
+      { path: 'profile-setup', element: <ProfileWizard /> },
       { path: 'quests', element: <Quests /> },
       { path: 'map', element: <Map /> },
       { path: 'hubs', element: <Hubs /> },
