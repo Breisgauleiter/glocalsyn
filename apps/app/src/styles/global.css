@@ -1,0 +1,130 @@
+/* Global styles: mobile-first, dark space theme */
+:root {
+  --bg-deep: #050714;
+  --bg-sky: radial-gradient(1200px 800px at 70% -10%, rgba(73, 97, 255, 0.25), transparent 60%),
+             radial-gradient(900px 700px at 10% 20%, rgba(190, 40, 255, 0.20), transparent 60%),
+             radial-gradient(800px 600px at 50% 80%, rgba(0, 200, 170, 0.12), transparent 60%);
+  --text: #e6e7ee;
+  --muted: #9aa2b2;
+  --nav-bg: rgba(8, 11, 26, 0.7);
+  --nav-border: rgba(255, 255, 255, 0.06);
+  --accent: #7dd3fc;
+  /* Glass tokens */
+  --glass-bg: rgba(10, 14, 30, 0.45);
+  --glass-elevated-bg: rgba(10, 14, 30, 0.6);
+  --glass-border: rgba(255, 255, 255, 0.08);
+  --glass-highlight: rgba(255, 255, 255, 0.12);
+  --glass-shadow: rgba(0, 0, 0, 0.35);
+}
+
+* { box-sizing: border-box; }
+html, body, #root { height: 100%; }
+body {
+  margin: 0;
+  background-color: var(--bg-deep);
+  color: var(--text);
+  font: 500 16px/1.5 system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, Noto Sans, Arial, "Apple Color Emoji", "Segoe UI Emoji";
+  overflow-x: hidden;
+}
+
+/* Starfield layers */
+.bg-sky {
+  position: fixed;
+  inset: 0;
+  z-index: -2;
+  background: var(--bg-sky), radial-gradient(1000px 700px at 30% -20%, rgba(255,255,255,0.08), transparent 60%);
+  filter: saturate(120%);
+}
+
+.starfield, .starfield::before, .starfield::after {
+  position: fixed;
+  inset: 0;
+  content: '';
+  pointer-events: none;
+  z-index: -1;
+  background-repeat: repeat;
+  background-size: 2px 2px, 3px 3px, 1px 1px;
+  animation: drift 120s linear infinite;
+}
+.starfield {
+  background-image: radial-gradient(2px 2px at 20px 30px, rgba(255,255,255,0.9) 50%, transparent 51%),
+                    radial-gradient(1px 1px at 50px 80px, rgba(255,255,255,0.7) 50%, transparent 51%),
+                    radial-gradient(1px 1px at 90px 120px, rgba(255,255,255,0.5) 50%, transparent 51%);
+  background-position: 0 0, 0 0, 0 0;
+  /* subtle twinkle */
+  animation-name: drift, twinkle;
+  animation-duration: 120s, 6s;
+  animation-timing-function: linear, ease-in-out;
+}
+.starfield::before {
+  animation-duration: 180s, 8s;
+  animation-name: drift, twinkle;
+  opacity: .7;
+  background-image: radial-gradient(1.5px 1.5px at 15px 60px, rgba(255,255,255,0.8) 50%, transparent 51%),
+                    radial-gradient(1px 1px at 120px 20px, rgba(255,255,255,0.6) 50%, transparent 51%);
+}
+.starfield::after {
+  animation-duration: 240s, 10s;
+  animation-name: drift, twinkle;
+  opacity: .5;
+  background-image: radial-gradient(1px 1px at 200px 140px, rgba(255,255,255,0.7) 50%, transparent 51%),
+                    radial-gradient(1px 1px at 300px 40px, rgba(255,255,255,0.5) 50%, transparent 51%);
+}
+
+@keyframes drift { from { transform: translateY(0); } to { transform: translateY(-2000px); } }
+@keyframes twinkle { 0%, 100% { opacity: 0.8; } 50% { opacity: 1; } }
+
+/* Gentle nebula breathe */
+@keyframes breathe { 0%, 100% { filter: blur(0px) saturate(100%); } 50% { filter: blur(2px) saturate(120%); } }
+.bg-sky { animation: breathe 20s ease-in-out infinite; }
+
+/* App shell layout */
+.app-shell {
+  min-height: 100dvh;
+  display: flex; flex-direction: column;
+}
+.app-header {
+  position: sticky; top: 0; z-index: 10; padding: 10px 16px; display: flex; align-items: center; justify-content: space-between;
+}
+.app-main { flex: 1; padding: 12px 12px 0; }
+.app-nav {
+  position: sticky; bottom: 0;
+}
+
+/* Tabs */
+.app-tabs { display: flex; margin: 0; padding: 8px 0; list-style: none; justify-content: space-around; }
+.app-tabs a { color: var(--muted); text-decoration: none; padding: 8px 10px; border-radius: 8px; }
+.app-tabs a.active { color: white; background: rgba(255,255,255,0.06); }
+.app-tabs a:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+/* Glassmorphism utilities */
+.glass-surface {
+  backdrop-filter: blur(12px) saturate(120%);
+  -webkit-backdrop-filter: blur(12px) saturate(120%);
+  background: linear-gradient(180deg, var(--glass-highlight) 0%, transparent 60%), var(--glass-bg);
+  border: 1px solid var(--glass-border);
+  box-shadow: 0 10px 30px var(--glass-shadow);
+}
+.glass-strong { background: linear-gradient(180deg, var(--glass-highlight) 0%, transparent 60%), var(--glass-elevated-bg); }
+.glass-soft { backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); background: var(--glass-bg); }
+
+/* Specific surfaces */
+.glass-header { border-bottom: 1px solid var(--glass-border); border-top: 1px solid rgba(255,255,255,0.04); border-radius: 0 0 16px 16px; }
+.glass-card {
+  border-radius: 12px; padding: 12px; margin-bottom: 12px;
+  background: linear-gradient(180deg, rgba(255,255,255,0.08) 0%, rgba(255,255,255,0.02) 100%), var(--glass-bg);
+  border: 1px solid var(--glass-border);
+  box-shadow: 0 8px 24px var(--glass-shadow);
+}
+.glass-footer { border-top: 1px solid var(--glass-border); }
+
+/* Footer with tree asset */
+.footer {
+  position: relative; display: flex; align-items: flex-end; justify-content: center; height: 120px;
+}
+.footer .horizon { position: absolute; left:0; right:0; bottom: 48px; height: 2px; background: linear-gradient(90deg, transparent, rgba(255,255,255,0.12), transparent); }
+.footer .tree { width: 120px; height: auto; opacity: .9; filter: drop-shadow(0 6px 12px rgba(0,0,0,.5)); }
+.footer small { position: absolute; bottom: 8px; color: var(--muted); }
+
+/* Apply glass to nav/footer */
+.app-nav { backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); background: var(--nav-bg); border-top: 1px solid var(--nav-border); }
