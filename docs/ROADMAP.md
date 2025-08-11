@@ -75,6 +75,19 @@ Nächste Schritte (kleine PRs):
  - Graph-UI Guidelines Markdown anlegen (Interaktionsprinzipien, Node-Typ Farben, Fokus-/Kontext-Modus)
  - Messpunkte definieren: FPS (≥ 50 Ziel mobil), Initial Payload Budget, Node Count Threshold für Auto-Downgrade
 
+#### Fortschritt (11.08.2025)
+- Account‑Link Flow (Opt‑in) [DELIVERED]
+- Read‑only GitHub Issues Adapter [DELIVERED] und hinter Feature‑Flag verdrahtet (default: off)
+- UI für Quests: Source‑Badges, Filter (persistiert), leere Zustände mit CTA [DELIVERED]
+- Tests: Unit + E2E grün; CI‑Workflow grün [DELIVERED]
+- Doku: GETTING_STARTED mit Env‑Flags (VITE_USE_GITHUB_ADAPTER, VITE_GITHUB_REPOS, optional TOKEN, LIMIT) [DELIVERED]
+
+Nächste Schritte (kleine PRs):
+- Repo‑Auswahl‑UI (mehrere Repos, Opt‑in je Repo)
+- Pagination/Limit für Adapter, defensive Rate‑Limit‑Handhabung
+- Semantik: PR→Issue‑Close‑Erzwingung für Proofs ab SCL ≥ 4 (read‑only bleibt vorerst bestehen)
+- I18n: DE/EN Texte für neue UI‑Elemente
+
 ## Phase 2: Community Features (Sprints 4-6)
 
 ### Sprint 04 – Hubs & Lokale Partner
@@ -124,6 +137,7 @@ Nächste Schritte (kleine PRs):
  - Pipeline: Syntopia‑ und GLOCALSPIRIT‑Issues → Syntopia‑Quests; das Erledigen via PR‑Merge/Issue‑Close lässt beide Repos und das Quest‑Angebot wachsen.
  - Proof‑Zusammenfassung: SCL 1–3 = Questabschluss (Client‑Proof); ab SCL 4 = verknüpfter GitHub‑Account + gereviewter PR, der das Issue schließt.
 
+<<<<<<< HEAD
 ### GitHub OAuth & Sync Roadmap (Detail)
 1. OAuth2 Einführung (Sprint 03): Backend Endpoints + state-Verifizierung + minimaler Token-Store (Access Token, optional Refresh falls Fine-Grained Tokens genutzt)
 2. Repo-Auswahl UI (Ende Sprint 03): Liste der Repos (nur notwendige Felder), persistierte Auswahl pro User
@@ -134,6 +148,35 @@ Nächste Schritte (kleine PRs):
 7. Contributor Feedback Loop: Optional Kommentar auf Issue bei Quest-Annahme / Completion (Opt‑in) (Sprint 06)
 
 Status (11.08.2025): Read‑only Adapter in App verdrahtet (Feature‑Flag: VITE_USE_GITHUB_ADAPTER), Repos via VITE_GITHUB_REPOS; Standard: off. Unit+E2E abgedeckt, CI grün. Nächster Meilenstein: selektive Repo‑Verknüpfung und verbesserte Proof‑Semantik.
+
+## Cross-Cutting Initiative: Graph-First UI (Lists → Networks)
+Ziel: Wo immer Beziehungen Mehrwert stiften (Kontakte, Gruppen, Quests, Hubs, Reviews), klassische Listen durch interaktive Graphrepräsentationen (3D bevorzugt, 2D/Listen-Fallback) zu ergänzen oder zu ersetzen.
+
+### Prinzipien
+1. Progressive Enhancement: 3D nur wenn Gerät/Browser-Fähigkeiten (WebGL2, ausreichende FPS) erkannt
+2. Erklärbarkeit: Hover / Fokus zeigt Kanten-Typen (z.B. "reviewed", "belongs_to", "continues", "bridge")
+3. Reduzierte Knotenlast: Virtualisierte/clustered Darstellung > X Nodes (Hierarchie / Community Detection)
+4. A11y-Pfad: Tastatur-Navigation (Tab sequence der fokussierbaren Nodes) + ARIA-Region mit Listen-Äquivalent
+5. Performance Budgets: Initial < 120KB gzipped Graph-UI Bundle; Mobile LCP < 2.5s
+
+### Phasen
+- POC (Sprint 03): Map 3D Graph (User/Quest/Hub) + Fallback
+- Hybrid (Sprint 04): Hub Directory Graph Overlay + Filter
+- Social Expansion (Sprint 05): Kontakte & Peer-Review Beziehungen
+- Governance (Sprint 05/06): Rollen & Moderationsnetz
+- Gamification (Sprint 06+): Influence / Propagation Simulation Light
+
+### Technologiekandidat
+Primär: react-force-graph-3d (Three.js basierend) – Gründe: Stabil etablierte API, Force-Engine konfigurierbar, VR/AR Erweiterbarkeit. Alternativen im Evaluations-Doc: sigma.js (2D), d3-force + custom Three Layer (höherer Wartungsaufwand), vivagraph.
+
+### GitHub OAuth & Sync Roadmap (Detail)
+1. OAuth2 Einführung (Sprint 03): Backend Endpoints + state-Verifizierung + minimaler Token-Store (Access Token, optional Refresh falls Fine-Grained Tokens genutzt)
+2. Repo-Auswahl UI (Ende Sprint 03): Liste der Repos (nur notwendige Felder), persistierte Auswahl pro User
+3. Sync v1 (Sprint 04): Polling mit Conditional Requests (ETag, Last-Modified) → Quest Deltas (Neu, Aktualisiert, Geschlossen)
+4. Proof-Automation v1 (Sprint 04): Wenn PR merged & Issue geschlossen → Quest auto markCompleted + XP
+5. Webhooks Migration (Sprint 05): Issue & PR Events → Push-basiert statt Polling; Fallback Polling als Backup
+6. Sicherheits-Härtung: Token Rotation, Scope Minimierung, Audit-Log (Link/Unlink) (Sprint 05)
+7. Contributor Feedback Loop: Optional Kommentar auf Issue bei Quest-Annahme / Completion (Opt‑in) (Sprint 06)
 
 ## Cross-Cutting Initiative: Graph-First UI (Lists → Networks)
 Ziel: Wo immer Beziehungen Mehrwert stiften (Kontakte, Gruppen, Quests, Hubs, Reviews), klassische Listen durch interaktive Graphrepräsentationen (3D bevorzugt, 2D/Listen-Fallback) zu ergänzen oder zu ersetzen.
@@ -172,8 +215,3 @@ Primär: react-force-graph-3d (Three.js basierend) – Gründe: Stabil etabliert
 - ≥ 95% der unterstützten Geräte liefern > 45 FPS bei 200 Knoten / 400 Kanten
 - Nutzer verstehen (Umfrage) "Warum sehe ich diese Empfehlung" (>80% Zustimmung)
 - Kein Anstieg von Abbruchraten in den Flows (Quest-Annahme) nach Graph-Einführung
-
-## Meilensteine
-- **M1** (Ende Sprint 3): MVP lauffähig, erste 100 Beta-Tester
-- **M2** (Ende Sprint 6): Community-Features aktiv, 1000 aktive Nutzer, Governance V1 aktiv
-- **M3** (Ende Sprint 9): Skalierungsreif, Public Launch vorbereitet
