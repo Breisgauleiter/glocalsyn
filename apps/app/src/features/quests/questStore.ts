@@ -62,9 +62,11 @@ export function useQuestStore(profileOverride?: Profile) {
     const canUseAdapter = profile.githubLinked && profile.scl >= 4 && isGithubAdapterEnabled();
     if (!canUseAdapter) return;
 
-    const envAny = (import.meta as any)?.env ?? (typeof process !== 'undefined' ? (process.env as any) : {});
-    const reposRaw = envAny.VITE_GITHUB_REPOS as string | undefined;
-    const repos = (reposRaw ?? '').split(',').map((s) => s.trim()).filter(Boolean);
+  const profileRepos = Array.isArray((profile as any).githubRepos) ? (profile as any).githubRepos as string[] : undefined;
+  const envAny = (import.meta as any)?.env ?? (typeof process !== 'undefined' ? (process.env as any) : {});
+  const reposRaw = envAny.VITE_GITHUB_REPOS as string | undefined;
+  const reposFromEnv = (reposRaw ?? '').split(',').map((s) => s.trim()).filter(Boolean);
+  const repos = (profileRepos && profileRepos.length > 0) ? profileRepos : reposFromEnv;
     if (repos.length === 0) return; // no configured repos -> keep baseline
 
     const adapter = createGithubAdapterFromEnv();

@@ -1,13 +1,23 @@
-import { useMemo } from 'react';
+import { useMemo, useState } from 'react';
 import { useProfile } from '../features/profile/profileStore';
 
 export function Me() {
   const { profile, update } = useProfile();
   const canLink = useMemo(() => !profile.githubLinked, [profile.githubLinked]);
+  const [reposInput, setReposInput] = useState<string>(() => (profile.githubRepos ?? []).join(', '));
 
   function linkGithub() {
     const nextScl = Math.max(profile.scl ?? 1, 4);
     update({ githubLinked: true, scl: nextScl as any });
+  }
+
+  function saveRepos(e: React.FormEvent) {
+    e.preventDefault();
+    const repos = reposInput
+      .split(',')
+      .map((s) => s.trim())
+      .filter(Boolean);
+    update({ githubRepos: repos });
   }
 
   return (
@@ -39,7 +49,25 @@ export function Me() {
             GitHub verknüpfen
           </button>
         ) : (
-          <p className="muted" aria-live="polite">GitHub ist verknüpft. Danke!</p>
+          <>
+            <p className="muted" aria-live="polite">GitHub ist verknüpft. Danke!</p>
+            <form onSubmit={saveRepos} className="stack" style={{ gap: 8 }} aria-label="GitHub Repos auswählen">
+              <label htmlFor="repos-input" className="muted">Repos (owner/name, komma-separiert)</label>
+              <input
+                id="repos-input"
+                name="repos"
+                type="text"
+                value={reposInput}
+                onChange={(e) => setReposInput(e.target.value)}
+                placeholder="owner1/repo1, owner2/repo2"
+                aria-describedby="repos-help"
+              />
+              <small id="repos-help" className="muted">Diese Auswahl überschreibt die Standard-Repo-Liste. Leer lassen = Standard verwenden.</small>
+              <div>
+                <button type="submit" className="btn">Speichern</button>
+              </div>
+            </form>
+          </>
         )}
       </div>
     </section>

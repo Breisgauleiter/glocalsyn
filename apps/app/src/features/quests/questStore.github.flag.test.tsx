@@ -50,4 +50,31 @@ describe('useQuestStore with GitHub adapter flag', () => {
     expect(spy).not.toHaveBeenCalled();
     spy.mockRestore();
   });
+
+  it('uses profile.githubRepos when provided (overrides env)', async () => {
+    process.env.VITE_USE_GITHUB_ADAPTER = 'true';
+    process.env.VITE_GITHUB_REPOS = 'env/ignored';
+
+    const issues: any[] = [];
+    const originalFetch = global.fetch;
+    global.fetch = vi.fn(async (input: any) => {
+      const url = String(input);
+      issues.push(url);
+      return { ok: true, json: async () => [] } as any;
+    }) as any;
+
+    try {
+      const { result } = renderHook(() => useQuestStore({ scl: 4, githubLinked: true, githubRepos: ['owner/a', 'owner/b'] } as any));
+      // baseline present
+      expect(result.current.quests.find((q) => q.id === 'q1')).toBeTruthy();
+      await Promise.resolve();
+      // Expect calls for owner/a and owner/b, not env/ignored
+      const joined = issues.join('\n');
+      expect(joined).toContain('/repos/owner/a/issues');
+      expect(joined).toContain('/repos/owner/b/issues');
+      expect(joined).not.toContain('/repos/env/ignored/issues');
+    } finally {
+      global.fetch = originalFetch as any;
+    }
+  });
 });

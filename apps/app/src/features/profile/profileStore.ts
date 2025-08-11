@@ -6,6 +6,7 @@ export interface Profile {
   region?: string;
   scl: SCLLevel;
   githubLinked: boolean;
+  githubRepos?: string[]; // optional per-user repo selection (overrides env if set)
 }
 
 const DEFAULT_PROFILE: Profile = { scl: 1 as SCLLevel, githubLinked: false };
@@ -18,7 +19,19 @@ export function useProfile() {
     if (raw) {
       try {
         const parsed = JSON.parse(raw) as Partial<Profile>;
-        setProfile({ ...DEFAULT_PROFILE, ...parsed });
+        // Normalize githubRepos if someone stored a string earlier
+        const normalized: Partial<Profile> = {
+          ...parsed,
+          githubRepos: Array.isArray((parsed as any).githubRepos)
+            ? (parsed as any).githubRepos
+            : typeof (parsed as any).githubRepos === 'string'
+              ? String((parsed as any).githubRepos)
+                  .split(',')
+                  .map((s) => s.trim())
+                  .filter(Boolean)
+              : parsed.githubRepos,
+        };
+        setProfile({ ...DEFAULT_PROFILE, ...normalized });
       } catch {}
     }
   }, []);
