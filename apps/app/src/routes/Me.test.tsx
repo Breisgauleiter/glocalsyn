@@ -28,4 +28,16 @@ describe('Me route – Link GitHub stub', () => {
     expect(parsed.githubLinked).toBe(true);
     expect(parsed.scl).toBeGreaterThanOrEqual(4);
   });
+
+  it('shows validation error for invalid repo format and does not persist', () => {
+    render(<Me />);
+    // Link first to reveal settings
+    fireEvent.click(screen.getByTestId('link-github'));
+    const input = screen.getByLabelText(/Repos \(owner\/name/i);
+    fireEvent.change(input, { target: { value: 'invalid-format' } });
+    fireEvent.click(screen.getByRole('button', { name: /Speichern/i }));
+    expect(screen.getByRole('alert')).toHaveTextContent('Ungültiges Format');
+    const parsed = JSON.parse(localStorage.getItem('profile')!);
+    expect(parsed.githubRepos || []).toEqual([]);
+  });
 });

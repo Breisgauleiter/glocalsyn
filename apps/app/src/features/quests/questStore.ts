@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import type { QuestDTO, ProofPolicy } from '../../../../../shared/types/src';
 import { mapIssueToQuest } from '../../../../../shared/types/src';
 import { MOCK_ISSUES } from './mockIssues';
-import { isGithubAdapterEnabled, createGithubAdapterFromEnv } from './githubAdapter';
+import { isGithubAdapterEnabled, createGithubAdapterFromEnv, RealGithubAdapter } from './githubAdapter';
 import { useProfile } from '../profile/profileStore';
 import type { Profile } from '../profile/profileStore';
 
@@ -69,12 +69,21 @@ export function useQuestStore(profileOverride?: Profile) {
   const repos = (profileRepos && profileRepos.length > 0) ? profileRepos : reposFromEnv;
     if (repos.length === 0) return; // no configured repos -> keep baseline
 
-    const adapter = createGithubAdapterFromEnv();
-    adapter
+    // If profile provides user token/state/labels, create a custom adapter
+    const hasUserPrefs = Boolean((profile as any).githubToken || (profile as any).githubIssueState || (profile as any).githubLabels);
+    const effectiveAdapter = hasUserPrefs
+      ? new RealGithubAdapter({
+          token: (profile as any).githubToken,
+          perRepoLimit: undefined,
+          state: (profile as any).githubIssueState,
+          labels: (profile as any).githubLabels,
+        })
+      : createGithubAdapterFromEnv();
+    effectiveAdapter
       .listIssues(repos)
-      .then((items) => {
+      .then((items: import('../../../../../shared/types/src').GitHubIssueLite[]) => {
         if (cancelled) return;
-        const mapped = items.map((iss) => {
+        const mapped = items.map((iss: import('../../../../../shared/types/src').GitHubIssueLite) => {
           const q = mapIssueToQuest(iss) as QuestDTO;
           return {
             id: q.id,
@@ -87,7 +96,7 @@ export function useQuestStore(profileOverride?: Profile) {
           } as Quest;
         });
         // Always keep dummy quests first to preserve onboarding path
-        setQuests([...DUMMY_QUESTS, ...mapped]);
+  setQuests([...DUMMY_QUESTS, ...mapped]);
       })
       .catch(() => {
         // Best-effort: ignore errors and keep baseline

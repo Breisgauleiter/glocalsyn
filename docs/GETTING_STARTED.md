@@ -57,3 +57,4 @@ Notes:
 - Adapter is read-only and best-effort. On errors it falls back to the baseline mock.
 - The dummy onboarding quest remains; when enabled, GitHub quests are added on top.
 - Per-user Repo-Auswahl: Nach dem Verknüpfen kann jede:r in "Ich" eine Repo-Liste (owner/name, komma-separiert) speichern. Diese überschreibt `VITE_GITHUB_REPOS`. Leer lassen = Standard verwenden.
+ - Zusätzlich pro Nutzer: Issue-Status (open/closed/all), Labels (komma-separiert) und optional ein persönliches Token können in "Ich" gesetzt werden. Diese Einstellungen beeinflussen nur den lokalen Client (read-only).
