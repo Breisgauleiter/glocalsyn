@@ -41,6 +41,19 @@
  - Proof‑Regeln (SCL ≥ 4): Nachweis = erfolgreich gereviewter PR, der das zugehörige Issue schließt (automatisch synchronisiert)
  - Issue→Quest Pipeline: Issues aus den Repos „Syntopia“ (später auch „GLOCALSPIRIT“) füllen die Quests; Quelle (Repo/Issue) und Status werden angezeigt
 
+#### Fortschritt (11.08.2025)
+- Account‑Link Flow (Opt‑in) [DELIVERED]
+- Read‑only GitHub Issues Adapter [DELIVERED] und hinter Feature‑Flag verdrahtet (default: off)
+- UI für Quests: Source‑Badges, Filter (persistiert), leere Zustände mit CTA [DELIVERED]
+- Tests: Unit + E2E grün; CI‑Workflow grün [DELIVERED]
+- Doku: GETTING_STARTED mit Env‑Flags (VITE_USE_GITHUB_ADAPTER, VITE_GITHUB_REPOS, optional TOKEN, LIMIT) [DELIVERED]
+
+Nächste Schritte (kleine PRs):
+- Repo‑Auswahl‑UI (mehrere Repos, Opt‑in je Repo)
+- Pagination/Limit für Adapter, defensive Rate‑Limit‑Handhabung
+- Semantik: PR→Issue‑Close‑Erzwingung für Proofs ab SCL ≥ 4 (read‑only bleibt vorerst bestehen)
+- I18n: DE/EN Texte für neue UI‑Elemente
+
 ## Phase 2: Community Features (Sprints 4-6)
 
 ### Sprint 04 – Hubs & Lokale Partner
@@ -84,6 +97,8 @@
 - Erklärbarkeit: Anzeige der Quelle (Repo/Issue) und des Grundes für die Empfehlung.
  - Pipeline: Syntopia‑ und GLOCALSPIRIT‑Issues → Syntopia‑Quests; das Erledigen via PR‑Merge/Issue‑Close lässt beide Repos und das Quest‑Angebot wachsen.
  - Proof‑Zusammenfassung: SCL 1–3 = Questabschluss (Client‑Proof); ab SCL 4 = verknüpfter GitHub‑Account + gereviewter PR, der das Issue schließt.
+
+Status (11.08.2025): Read‑only Adapter in App verdrahtet (Feature‑Flag: VITE_USE_GITHUB_ADAPTER), Repos via VITE_GITHUB_REPOS; Standard: off. Unit+E2E abgedeckt, CI grün. Nächster Meilenstein: selektive Repo‑Verknüpfung und verbesserte Proof‑Semantik.
 
 ## Meilensteine
 - **M1** (Ende Sprint 3): MVP lauffähig, erste 100 Beta-Tester
