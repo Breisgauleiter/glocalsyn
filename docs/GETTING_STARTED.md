@@ -56,3 +56,4 @@ To enable read-only GitHub issues as a quest source (for users with SCL ≥ 4 an
 Notes:
 - Adapter is read-only and best-effort. On errors it falls back to the baseline mock.
 - The dummy onboarding quest remains; when enabled, GitHub quests are added on top.
+- Per-user Repo-Auswahl: Nach dem Verknüpfen kann jede:r in "Ich" eine Repo-Liste (owner/name, komma-separiert) speichern. Diese überschreibt `VITE_GITHUB_REPOS`. Leer lassen = Standard verwenden.

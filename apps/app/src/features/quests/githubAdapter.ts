@@ -31,32 +31,36 @@ export class RealGithubAdapter implements GithubAdapter {
     const qs = new URLSearchParams({ state: this.state, per_page: String(this.perRepoLimit) });
     if (this.labels?.length) qs.set('labels', this.labels.join(','));
 
-    const out: GitHubIssueLite[] = [];
-    for (const repo of repos) {
-      // Basic validation for owner/repo
-      if (!/^[A-Za-z0-9_.-]+\/[A-Za-z0-9_.-]+$/.test(repo)) continue;
-      const url = `https://api.github.com/repos/${repo}/issues?${qs.toString()}`;
-      const res = await fetch(url, { headers });
-      if (!res.ok) {
-        // Skip this repo on API error; keep adapter tolerant for now (read-only, best-effort)
-        continue;
-      }
-      const data: any[] = await res.json();
-      for (const it of data) {
-        // Filter out PRs (GitHub returns PRs in the issues list when using the issues endpoint)
-        if (it.pull_request) continue;
-        out.push({
-          id: it.id,
-          number: it.number,
-          title: it.title,
-          body: it.body ?? undefined,
-          url: it.html_url,
-          repo,
-          labels: Array.isArray(it.labels) ? it.labels.map((l: any) => (typeof l === 'string' ? l : l?.name)).filter(Boolean) : undefined,
-        });
-      }
-    }
-    return out;
+    const results = await Promise.all(
+      repos.map(async (repo) => {
+        // Basic validation for owner/repo
+        if (!/^[A-Za-z0-9_.-]+\/[A-Za-z0-9_.-]+$/.test(repo)) return [] as GitHubIssueLite[];
+        const url = `https://api.github.com/repos/${repo}/issues?${qs.toString()}`;
+        const res = await fetch(url, { headers });
+        if (!res.ok) {
+          // Skip this repo on API error; keep adapter tolerant for now (read-only, best-effort)
+          return [] as GitHubIssueLite[];
+        }
+        const data: any[] = await res.json();
+        const mapped: GitHubIssueLite[] = [];
+        for (const it of data) {
+          // Filter out PRs (GitHub returns PRs in the issues list when using the issues endpoint)
+          if (it.pull_request) continue;
+          mapped.push({
+            id: it.id,
+            number: it.number,
+            title: it.title,
+            body: it.body ?? undefined,
+            url: it.html_url,
+            repo,
+            labels: Array.isArray(it.labels) ? it.labels.map((l: any) => (typeof l === 'string' ? l : l?.name)).filter(Boolean) : undefined,
+          });
+        }
+        return mapped;
+      })
+    );
+
+    return results.flat();
   }
 }
 
