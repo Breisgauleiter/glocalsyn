@@ -8,9 +8,9 @@
 
 #### Deliverables
 - PWA-Shell mit Tab-Navigation (Home, Quests, Map, Hubs, Ich) – [DELIVERED: App-Shell]
-- Login-Flow + minimaler Profilwizard – [IN PROGRESS]
+- Login-Flow + minimaler Profilwizard – [DELIVERED]
 - Eine funktionsfähige Dummy-Quest (Client-seitig) – [DELIVERED]
-- Tests: E2E Happy Path – [DELIVERED]; Unit-Tests – [PENDING]
+- Tests: E2E Happy Path – [DELIVERED]; Unit-Tests – [DELIVERED]
 - Dokumentation: „How to run & test“ – [DELIVERED]
 - Klarstellung: Sacred Geometry nur als Design-System (keine Gameplay-Features)
 
@@ -24,6 +24,7 @@
 - Mindestens 3 Nachweisarten (Check-in, Foto, Peer-Bestätigung)
 - XP-System und Badge-Belohnungen
 - Review-Queue für Nachweise (Proof Verifier Rolle)
+ - Proof-Regeln (SCL 1–3): Abschluss der Quest genügt (Client‑Proof, datensparsam)
 
 ### Sprint 03 – Graph & Empfehlungen
 **Zeitrahmen**: 3 Wochen  
@@ -36,6 +37,9 @@
 - Graph-basierte Vielfaltsmechaniken
 - Start: GitHub‑Quests (SCL ≥ 4) – Account‑Link Flow (Opt‑in) + Quest‑Source‑Adapter (GitHub Issues, read‑only)
 - Aufstiegs‑Quest zu SCL 4 vorbereitet (Repo‑Verknüpfung als Quest)
+ - Aufstiegs‑Proof zu SCL 4: erfolgreiche Verknüpfung des Syntopia‑Accounts mit dem GitHub‑Account
+ - Proof‑Regeln (SCL ≥ 4): Nachweis = erfolgreich gereviewter PR, der das zugehörige Issue schließt (automatisch synchronisiert)
+ - Issue→Quest Pipeline: Issues aus den Repos „Syntopia“ (später auch „GLOCALSPIRIT“) füllen die Quests; Quelle (Repo/Issue) und Status werden angezeigt
 
 ## Phase 2: Community Features (Sprints 4-6)
 
@@ -78,6 +82,8 @@
 - Start ab Sprint 03: Quests aus echten GitHub‑Issues (Feature/Fix) – zunächst read‑only Adapter + Account‑Link Flow.
 - Aufstiegs‑Quest zu SCL 4: Verknüpfe dein Syntopia‑Profil mit einem GitHub‑Repository (Opt‑in, transparent, widerrufbar).
 - Erklärbarkeit: Anzeige der Quelle (Repo/Issue) und des Grundes für die Empfehlung.
+ - Pipeline: Syntopia‑ und GLOCALSPIRIT‑Issues → Syntopia‑Quests; das Erledigen via PR‑Merge/Issue‑Close lässt beide Repos und das Quest‑Angebot wachsen.
+ - Proof‑Zusammenfassung: SCL 1–3 = Questabschluss (Client‑Proof); ab SCL 4 = verknüpfter GitHub‑Account + gereviewter PR, der das Issue schließt.
 
 ## Meilensteine
 - **M1** (Ende Sprint 3): MVP lauffähig, erste 100 Beta-Tester
