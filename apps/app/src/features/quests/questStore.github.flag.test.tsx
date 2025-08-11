@@ -26,8 +26,10 @@ describe('useQuestStore with GitHub adapter flag', () => {
 
     try {
       const { result } = renderHook(() => useQuestStore({ scl: 4, githubLinked: true } as any));
-      // Baseline should include dummy quest
-      expect(result.current.quests.find((q) => q.id === 'q1')).toBeTruthy();
+      // Baseline should include dummy quest (await effect)
+      await waitFor(() => {
+        expect(result.current.quests.find((q) => q.id === 'q1')).toBeTruthy();
+      });
 
       // Wait for enrichment
   await waitFor(() => {
@@ -44,10 +46,13 @@ describe('useQuestStore with GitHub adapter flag', () => {
     const spy = vi.spyOn(global, 'fetch' as any);
     const { result } = renderHook(() => useQuestStore({ scl: 4, githubLinked: true } as any));
     // Baseline only; no fetch calls
-    expect(result.current.quests.find((q) => q.id === 'q1')).toBeTruthy();
-  // Give microtasks a tick
-  await Promise.resolve();
-    expect(spy).not.toHaveBeenCalled();
+    await waitFor(() => {
+      expect(result.current.quests.find((q) => q.id === 'q1')).toBeTruthy();
+    });
+    // Ensure no network was attempted
+    await waitFor(() => {
+      expect(spy).not.toHaveBeenCalled();
+    });
     spy.mockRestore();
   });
 
@@ -66,12 +71,17 @@ describe('useQuestStore with GitHub adapter flag', () => {
     try {
       const { result } = renderHook(() => useQuestStore({ scl: 4, githubLinked: true, githubRepos: ['owner/a', 'owner/b'] } as any));
       // baseline present
-      expect(result.current.quests.find((q) => q.id === 'q1')).toBeTruthy();
-      await Promise.resolve();
-      // Expect calls for owner/a and owner/b, not env/ignored
+      await waitFor(() => {
+        expect(result.current.quests.find((q) => q.id === 'q1')).toBeTruthy();
+      });
+      // Wait until fetches have been attempted for both profile repos
+      await waitFor(() => {
+        const joined = issues.join('\n');
+        expect(joined).toContain('/repos/owner/a/issues');
+        expect(joined).toContain('/repos/owner/b/issues');
+      });
+      // And ensure env repo was not used
       const joined = issues.join('\n');
-      expect(joined).toContain('/repos/owner/a/issues');
-      expect(joined).toContain('/repos/owner/b/issues');
       expect(joined).not.toContain('/repos/env/ignored/issues');
     } finally {
       global.fetch = originalFetch as any;
