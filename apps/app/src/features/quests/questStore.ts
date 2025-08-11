@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import type { QuestDTO, ProofPolicy } from '../../../../../shared/types/src';
 import { mapIssueToQuest } from '../../../../../shared/types/src';
 import { MOCK_ISSUES } from './mockIssues';
+import { isGithubAdapterEnabled, createGithubAdapterFromEnv } from './githubAdapter';
 import { useProfile } from '../profile/profileStore';
 import type { Profile } from '../profile/profileStore';
 
@@ -53,7 +54,46 @@ export function useQuestStore(profileOverride?: Profile) {
   const [statusById, setStatusById] = useState<Record<string, QuestStatus>>({});
 
   useEffect(() => {
+    // Always set a fast, synchronous baseline first (mock path / local)
     setQuests(getQuestsForProfile({ githubLinked: profile.githubLinked, scl: profile.scl }));
+
+    // If SCL >= 4, GitHub is linked, and the adapter is enabled via env, try to load real issues
+    let cancelled = false;
+    const canUseAdapter = profile.githubLinked && profile.scl >= 4 && isGithubAdapterEnabled();
+    if (!canUseAdapter) return;
+
+    const envAny = (import.meta as any)?.env ?? (typeof process !== 'undefined' ? (process.env as any) : {});
+    const reposRaw = envAny.VITE_GITHUB_REPOS as string | undefined;
+    const repos = (reposRaw ?? '').split(',').map((s) => s.trim()).filter(Boolean);
+    if (repos.length === 0) return; // no configured repos -> keep baseline
+
+    const adapter = createGithubAdapterFromEnv();
+    adapter
+      .listIssues(repos)
+      .then((items) => {
+        if (cancelled) return;
+        const mapped = items.map((iss) => {
+          const q = mapIssueToQuest(iss) as QuestDTO;
+          return {
+            id: q.id,
+            title: q.title,
+            description: q.description,
+            category: q.category,
+            minimumSCL: q.minimumSCL,
+            proof: q.proof,
+            source: q.source,
+          } as Quest;
+        });
+        // Always keep dummy quests first to preserve onboarding path
+        setQuests([...DUMMY_QUESTS, ...mapped]);
+      })
+      .catch(() => {
+        // Best-effort: ignore errors and keep baseline
+      });
+
+    return () => {
+      cancelled = true;
+    };
   }, [profile.githubLinked, profile.scl]);
 
   function accept(id: string) {
