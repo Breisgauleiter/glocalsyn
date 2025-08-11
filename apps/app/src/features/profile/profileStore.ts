@@ -7,6 +7,9 @@ export interface Profile {
   scl: SCLLevel;
   githubLinked: boolean;
   githubRepos?: string[]; // optional per-user repo selection (overrides env if set)
+  githubIssueState?: 'open' | 'closed' | 'all'; // optional per-user issue state filter
+  githubLabels?: string[]; // optional per-user labels filter
+  githubToken?: string; // optional personal token (stored locally only)
 }
 
 const DEFAULT_PROFILE: Profile = { scl: 1 as SCLLevel, githubLinked: false };
@@ -30,6 +33,14 @@ export function useProfile() {
                   .map((s) => s.trim())
                   .filter(Boolean)
               : parsed.githubRepos,
+          githubLabels: Array.isArray((parsed as any).githubLabels)
+            ? (parsed as any).githubLabels
+            : typeof (parsed as any).githubLabels === 'string'
+              ? String((parsed as any).githubLabels)
+                  .split(',')
+                  .map((s) => s.trim())
+                  .filter(Boolean)
+              : parsed.githubLabels,
         };
         setProfile({ ...DEFAULT_PROFILE, ...normalized });
       } catch {}
