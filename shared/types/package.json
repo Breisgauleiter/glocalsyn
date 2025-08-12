@@ -8,7 +8,7 @@
     "build": "tsc -p tsconfig.json",
   "lint": "eslint --ext .ts src",
   "format": "prettier --write .",
-    "test": "node -e \"console.log('no tests yet')\""
+    "test": "vitest run"
   },
   "devDependencies": {
   "eslint": "^8.57.0",
@@ -17,6 +17,7 @@
   "eslint-config-prettier": "^9.1.0",
   "prettier": "^3.3.3",
     "@types/node": "^20.14.9",
-    "typescript": "^5.5.4"
+    "typescript": "^5.5.4",
+    "vitest": "^1.6.0"
   }
 }

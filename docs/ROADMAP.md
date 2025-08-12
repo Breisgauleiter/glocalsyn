@@ -50,22 +50,23 @@
 
 #### Fortschritt (12.08.2025)
 - Account‑Link Flow (Opt‑in) [DELIVERED]
-- Read‑only GitHub Issues Adapter [DELIVERED] und hinter Feature‑Flag verdrahtet (default: off)
-- UI für Quests: Source‑Badges, Filter (persistiert), leere Zustände mit CTA [DELIVERED]; neue Proof‑Typen in Detail‑UI (Check‑in, Text, Link, Foto, Peer)
+- Read‑only GitHub Issues Adapter [DELIVERED] (Feature‑Flag: VITE_USE_GITHUB_ADAPTER, default off)
+- Repo‑Auswahl UI (mehrere Repos, Persistenz im Profil) [DELIVERED]
+- UI Quests: Source‑Badges, persistente Filter, leere Zustände mit CTA [DELIVERED]; Proof‑Typen Check‑in, Text, Link, Foto, Peer konsolidiert
 - Review‑Queue: Proof‑Typ Badges, Filter, Foto‑Vorschau, Peer‑Notiz [DELIVERED]
-- Tests: Unit + E2E grün; CI‑Workflow grün [DELIVERED]
-- Doku: GETTING_STARTED mit Env‑Flags (VITE_USE_GITHUB_ADAPTER, VITE_GITHUB_REPOS, optional TOKEN, LIMIT) [DELIVERED]
+- Proof‑Semantik: XP & Badge Progression erweitert (Legacy 'done' Normalisierung, Reviewer / Threshold Badges) [DELIVERED]
+- Test-Infrastruktur gehärtet: speicherstabiles per‑File Runner, konsolidierte QuestDetail Flows, Coverage (v8) sequentiell, neue questStore Tests (Approve/Reject, XP/SCL, Badges) [DELIVERED]
+- Doku aktualisiert (GETTING_STARTED, TESTING) mit Env‑Flags & Coverage Nutzung [DELIVERED]
 
 Nächste Schritte (kleine PRs):
-- TAO-Graph-Modell in shared/types und Backend: ArangoDB Collections für Objects (user, hub, quest) und Associations (follows, joins, recommends)
-- Repo‑Auswahl‑UI (mehrere Repos, Opt‑in je Repo)
-- Pagination/Limit für Adapter, defensive Rate‑Limit‑Handhabung
-- Semantik: PR→Issue‑Close‑Erzwingung für Proofs ab SCL ≥ 4 (read‑only bleibt vorerst bestehen)
-- I18n: DE/EN Texte für neue UI‑Elemente
- - GitHub OAuth2 Implementierung (Sprint 03→04 Übergang): Backend Redirect & Callback, Token-Exchange, Verschlüsselung at rest, Logout/Token Revoke
- - Repo-Auswahl nach OAuth: Abruf user/org Repos via API (paginierend) + Opt‑in pro Repo, Speicherung minimaler Metadaten
- - Sync Pipeline v1: Periodisches Polling (ETag) für Issues der verknüpften Repos → Quest-Refresh (Delta-basiert)
- - Webhook-Vorbereitung (optional): Konfigurationsentwurf für spätere Echtzeit-Sync (Issue events, Pull Request events)
+- TAO-Graph-Modell Verfeinerung: shared/types Erweiterung (Brücken-Attribute, Diversity Tags) + Service Endpoints
+- "Heute dran..." Empfehlungen Placeholder (Home) mit erklärbarem Mock-Reason (Brückenquest, Vielfalt, Fortsetzung)
+- Pagination & Limit + defensive Rate-Limit-Handhabung im GitHub Adapter
+- Semantik: Vorbereitung PR→Issue Close Mapping (Proof Voraussetzung ab SCL ≥ 4, noch read‑only)
+- I18n: DE/EN für neue Graph/Empfehlungs-UI Strings
+- OAuth2 Spezifikation konkretisieren (Start/Callback Endpoints, State, Token Persist Layer) → Übergang Sprint 04
+- Sync Pipeline v1 Draft: Polling Contract (ETag, If-None-Match) + Delta Merge Strategie
+- Optional: Memory Profiling Ticket (Rückweg zu parallelem Vitest falls machbar)
 
 ## Phase 2: Community Features (Sprints 4-6)
 
