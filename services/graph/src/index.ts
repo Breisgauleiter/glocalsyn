@@ -55,8 +55,18 @@ export function recommendInMemory(objects: GraphObject[], edges: InMemoryEdge[],
     .map(node => ({ node: node as SharedGraphObject, reasons: [{ code: 'social_proof', explanation: 'in-memory edge' }] }));
 }
 
+function enrichObject<T extends Partial<GraphObject>>(o: T): T & Pick<GraphObject, 'diversityTags' | 'bridgeScore' | 'activityScore'> {
+  return {
+    diversityTags: Array.isArray((o as any).diversityTags) ? (o as any).diversityTags : [],
+    bridgeScore: typeof (o as any).bridgeScore === 'number' ? (o as any).bridgeScore : 0,
+    activityScore: typeof (o as any).activityScore === 'number' ? (o as any).activityScore : 0,
+    ...o
+  } as any;
+}
+
 export function buildMapSnapshot(objects: GraphObject[], edges: InMemoryEdge[], limit = 200) {
-  return { nodes: objects.slice(0, limit), edges: edges.slice(0, limit * 2), meta: { generatedAt: Date.now(), nodeCount: objects.length, edgeCount: edges.length } };
+  const sliced = objects.slice(0, limit).map(enrichObject);
+  return { nodes: sliced, edges: edges.slice(0, limit * 2), meta: { generatedAt: Date.now(), nodeCount: objects.length, edgeCount: edges.length } };
 }
 
 export async function bootstrap() {
