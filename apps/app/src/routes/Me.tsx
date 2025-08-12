@@ -44,7 +44,6 @@ export function Me() {
     update({ githubRepos: arr });
     setReposInput(arr.join(', '));
   }
-
   return (
     <section aria-labelledby="me-title" className="container stack" style={{ padding: 16 }}>
       <h1 id="me-title">{t('me.title')}</h1>
