@@ -51,7 +51,7 @@
 
 
 #### Fortschritt (12.08.2025)
-- Account‑Link Flow (Opt‑in) [DELIVERED]
+- Account‑Link Flow (Opt‑in) [DELIVERED (provisorisch – client-state, noch ohne persistente User‑Collection)]
  - Read‑only GitHub Issues Adapter [DELIVERED] (Feature‑Flag: VITE_USE_GITHUB_ADAPTER, default off)
  - Repo‑Auswahl UI (mehrere Repos, Persistenz im Profil) [DELIVERED]
  - UI Quests: Source‑Badges, persistente Filter, leere Zustände mit CTA [DELIVERED]; Proof‑Typen Check‑in, Text, Link, Foto, Peer konsolidiert
@@ -62,18 +62,22 @@
  - Graph-First UI Initiative: Evaluierung 3D-Force-Libs (react-force-graph-3d, drei.js basierte Optionen) [PLANNED]
  - Accessibility & Performance Leitplanken für 3D: Fallback-Strategie skizziert (SSR-Liste / 2D Force) [PLANNED]
 
-Nächste Schritte (kleine PRs):
- - TAO-Graph-Modell Verfeinerung: shared/types Erweiterung (Brücken-Attribute, Diversity Tags) + Service Endpoints
- - "Heute dran..." Empfehlungen Placeholder (Home) mit erklärbarem Mock-Reason (Brückenquest, Vielfalt, Fortsetzung)
- - Pagination & Limit + defensive Rate-Limit-Handhabung im GitHub Adapter
- - Semantik: Vorbereitung PR→Issue Close Mapping (Proof Voraussetzung ab SCL ≥ 4, noch read‑only)
- - I18n: DE/EN für neue Graph/Empfehlungs-UI Strings
- - OAuth2 Spezifikation konkretisieren (Start/Callback Endpoints, State, Token Persist Layer) → Übergang Sprint 04 [DELIVERED: Spec `docs/OAUTH2_GITHUB_SPEC.md`]
- - Sync Pipeline v1 Draft: Polling Contract (ETag, If-None-Match) + Delta Merge Strategie
- - Optional: Memory Profiling Ticket (Rückweg zu parallelem Vitest falls machbar)
- - 3D Graph Map POC implementieren (Feature-Flag `VITE_ENABLE_GRAPH_3D` + Fallback Rendering testen)
- - Graph-UI Guidelines Markdown anlegen (Interaktionsprinzipien, Node-Typ Farben, Fokus-/Kontext-Modus)
- - Messpunkte definieren: FPS (≥ 50 Ziel mobil), Initial Payload Budget, Node Count Threshold für Auto-Downgrade
+Nächste Schritte (kleine PRs) – aktualisierte Reihenfolge nach Architekturentscheidung:
+ 1. Auth Backend Spezifikation (`docs/AUTH_BACKEND_SPEC.md`) – Persistente User (Registrierung, Login, Session / Token), User Collection in Arango, Passwordless Option evaluieren. (NEU)
+ 2. Minimal Auth Backend Implementierung (User anlegen, Login, Session Handling, secure cookie / bearer) – Voraussetzung für echte Provider‑Links. (NEU)
+ 3. TAO-Graph-Modell Verfeinerung: shared/types Erweiterung (Brücken-Attribute, Diversity Tags) + Service Endpoints
+ 4. "Heute dran..." Empfehlungen Placeholder (Home) mit erklärbarem Mock-Reason (Brückenquest, Vielfalt, Fortsetzung)
+ 5. Pagination & Limit + defensive Rate-Limit-Handhabung im GitHub Adapter
+ 6. Semantik: Vorbereitung PR→Issue Close Mapping (Proof Voraussetzung ab SCL ≥ 4, noch read‑only)
+ 7. I18n: DE/EN für neue Graph/Empfehlungs-UI Strings
+ 8. OAuth2 Spezifikation konkretisieren (Start/Callback Endpoints, State, Token Persist Layer) [DELIVERED: Spec `docs/OAUTH2_GITHUB_SPEC.md`] – Implementierung erst NACH (1)+(2)
+ 9. Sync Pipeline v1 Draft: Polling Contract (ETag, If-None-Match) + Delta Merge Strategie
+ 10. Optional: Memory Profiling Ticket (Rückweg zu parallelem Vitest falls machbar)
+ 11. 3D Graph Map POC implementieren (Feature-Flag `VITE_ENABLE_GRAPH_3D` + Fallback Rendering testen)
+ 12. Graph-UI Guidelines Markdown anlegen (Interaktionsprinzipien, Node-Typ Farben, Fokus-/Kontext-Modus)
+ 13. Messpunkte definieren: FPS (≥ 50 Ziel mobil), Initial Payload Budget, Node Count Threshold für Auto-Downgrade
+
+Hinweis: Die GitHub OAuth Implementierung (Endpoints + Token Store) verschiebt sich bewusst hinter die persistente User-Persistenz, um eine saubere Zuordnung (stable userId) zu garantieren und spätere Migrationen / Token-Rewrites zu vermeiden.
 
 ## Phase 2: Community Features (Sprints 4-6)
 
@@ -124,14 +128,17 @@ Nächste Schritte (kleine PRs):
  - Pipeline: Syntopia‑ und GLOCALSPIRIT‑Issues → Syntopia‑Quests; das Erledigen via PR‑Merge/Issue‑Close lässt beide Repos und das Quest‑Angebot wachsen.
  - Proof‑Zusammenfassung: SCL 1–3 = Questabschluss (Client‑Proof); ab SCL 4 = verknüpfter GitHub‑Account + gereviewter PR, der das Issue schließt.
 
-### GitHub OAuth & Sync Roadmap (Detail)
-1. OAuth2 Einführung (Sprint 03): Backend Endpoints + state-Verifizierung + minimaler Token-Store (Access Token, optional Refresh falls Fine-Grained Tokens genutzt)
-2. Repo-Auswahl UI (Ende Sprint 03): Liste der Repos (nur notwendige Felder), persistierte Auswahl pro User
-3. Sync v1 (Sprint 04): Polling mit Conditional Requests (ETag, Last-Modified) → Quest Deltas (Neu, Aktualisiert, Geschlossen)
-4. Proof-Automation v1 (Sprint 04): Wenn PR merged & Issue geschlossen → Quest auto markCompleted + XP
+### GitHub OAuth & Sync Roadmap (Detail) – aktualisiert
+0. Core User Persistenz & Auth Backend (Ende Sprint 03 / Start Sprint 04): User Collection (Arango), Registrierung/Login, Sessions/Cookies, stable userId.
+1. OAuth2 Einführung (Sprint 04 nach Abschluss 0): Backend Endpoints + state-Verifizierung + minimaler Token-Store (Access Token, optional Refresh falls Fine-Grained Tokens genutzt)
+2. Repo-Auswahl UI (Sprint 04): Liste der Repos (nur notwendige Felder), persistierte Auswahl pro User
+3. Sync v1 (Sprint 04/05 Übergang): Polling mit Conditional Requests (ETag, Last-Modified) → Quest Deltas (Neu, Aktualisiert, Geschlossen)
+4. Proof-Automation v1 (Sprint 05): Wenn PR merged & Issue geschlossen → Quest auto markCompleted + XP
 5. Webhooks Migration (Sprint 05): Issue & PR Events → Push-basiert statt Polling; Fallback Polling als Backup
 6. Sicherheits-Härtung: Token Rotation, Scope Minimierung, Audit-Log (Link/Unlink) (Sprint 05)
 7. Contributor Feedback Loop: Optional Kommentar auf Issue bei Quest-Annahme / Completion (Opt‑in) (Sprint 06)
+
+Architektur-Entscheidung: Reihenfolge (2) persistent auth → (1) OAuth2 Implementation minimiert Risiko von Datenmigrationen und erlaubt frühere Nutzung von userId als Foreign Key in Graph / Quests / TokenStore.
 
 Status (11.08.2025): Read‑only Adapter in App verdrahtet (Feature‑Flag: VITE_USE_GITHUB_ADAPTER), Repos via VITE_GITHUB_REPOS; Standard: off. Unit+E2E abgedeckt, CI grün. Nächster Meilenstein: selektive Repo‑Verknüpfung und verbesserte Proof‑Semantik.
 
