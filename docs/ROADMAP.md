@@ -46,26 +46,34 @@
 	- Aufstiegs‑Proof zu SCL 4: erfolgreiche Verknüpfung des Syntopia‑Accounts mit dem GitHub‑Account
 	- Proof‑Regeln (SCL ≥ 4): Nachweis = erfolgreich gereviewter PR, der das zugehörige Issue schließt (automatisch synchronisiert)
 	- Issue→Quest Pipeline: Issues aus den Repos „Syntopia“ (später auch „GLOCALSPIRIT“) füllen die Quests; Quelle (Repo/Issue) und Status werden angezeigt
+ - 3D Graph Map POC (react-force-graph-3d oder Alternative) – Visualisierung der Knoten: User, Quests, Hubs (progressive enhancement, Low‑Spec Fallback 2D / vereinfachte Liste)
+ - Basis-Konzept „Graph-First UI" dokumentiert (Richtlinien für ersetzbare Listen → interaktive Netzwerke)
 
 
 #### Fortschritt (12.08.2025)
 - Account‑Link Flow (Opt‑in) [DELIVERED]
-- Read‑only GitHub Issues Adapter [DELIVERED] und hinter Feature‑Flag verdrahtet (default: off)
-- UI für Quests: Source‑Badges, Filter (persistiert), leere Zustände mit CTA [DELIVERED]; neue Proof‑Typen in Detail‑UI (Check‑in, Text, Link, Foto, Peer)
-- Review‑Queue: Proof‑Typ Badges, Filter, Foto‑Vorschau, Peer‑Notiz [DELIVERED]
-- Tests: Unit + E2E grün; CI‑Workflow grün [DELIVERED]
-- Doku: GETTING_STARTED mit Env‑Flags (VITE_USE_GITHUB_ADAPTER, VITE_GITHUB_REPOS, optional TOKEN, LIMIT) [DELIVERED]
+ - Read‑only GitHub Issues Adapter [DELIVERED] (Feature‑Flag: VITE_USE_GITHUB_ADAPTER, default off)
+ - Repo‑Auswahl UI (mehrere Repos, Persistenz im Profil) [DELIVERED]
+ - UI Quests: Source‑Badges, persistente Filter, leere Zustände mit CTA [DELIVERED]; Proof‑Typen Check‑in, Text, Link, Foto, Peer konsolidiert
+ - Review‑Queue: Proof‑Typ Badges, Filter, Foto‑Vorschau, Peer‑Notiz [DELIVERED]
+ - Proof‑Semantik: XP & Badge Progression erweitert (Legacy 'done' Normalisierung, Reviewer / Threshold Badges) [DELIVERED]
+ - Test-Infrastruktur gehärtet: speicherstabiles per‑File Runner, konsolidierte QuestDetail Flows, Coverage (v8) sequentiell, neue questStore Tests (Approve/Reject, XP/SCL, Badges) [DELIVERED]
+ - Doku aktualisiert (GETTING_STARTED, TESTING) mit Env‑Flags & Coverage Nutzung [DELIVERED]
+ - Graph-First UI Initiative: Evaluierung 3D-Force-Libs (react-force-graph-3d, drei.js basierte Optionen) [PLANNED]
+ - Accessibility & Performance Leitplanken für 3D: Fallback-Strategie skizziert (SSR-Liste / 2D Force) [PLANNED]
 
 Nächste Schritte (kleine PRs):
-- TAO-Graph-Modell in shared/types und Backend: ArangoDB Collections für Objects (user, hub, quest) und Associations (follows, joins, recommends)
-- Repo‑Auswahl‑UI (mehrere Repos, Opt‑in je Repo)
-- Pagination/Limit für Adapter, defensive Rate‑Limit‑Handhabung
-- Semantik: PR→Issue‑Close‑Erzwingung für Proofs ab SCL ≥ 4 (read‑only bleibt vorerst bestehen)
-- I18n: DE/EN Texte für neue UI‑Elemente
- - GitHub OAuth2 Implementierung (Sprint 03→04 Übergang): Backend Redirect & Callback, Token-Exchange, Verschlüsselung at rest, Logout/Token Revoke
- - Repo-Auswahl nach OAuth: Abruf user/org Repos via API (paginierend) + Opt‑in pro Repo, Speicherung minimaler Metadaten
- - Sync Pipeline v1: Periodisches Polling (ETag) für Issues der verknüpften Repos → Quest-Refresh (Delta-basiert)
- - Webhook-Vorbereitung (optional): Konfigurationsentwurf für spätere Echtzeit-Sync (Issue events, Pull Request events)
+ - TAO-Graph-Modell Verfeinerung: shared/types Erweiterung (Brücken-Attribute, Diversity Tags) + Service Endpoints
+ - "Heute dran..." Empfehlungen Placeholder (Home) mit erklärbarem Mock-Reason (Brückenquest, Vielfalt, Fortsetzung)
+ - Pagination & Limit + defensive Rate-Limit-Handhabung im GitHub Adapter
+ - Semantik: Vorbereitung PR→Issue Close Mapping (Proof Voraussetzung ab SCL ≥ 4, noch read‑only)
+ - I18n: DE/EN für neue Graph/Empfehlungs-UI Strings
+ - OAuth2 Spezifikation konkretisieren (Start/Callback Endpoints, State, Token Persist Layer) → Übergang Sprint 04
+ - Sync Pipeline v1 Draft: Polling Contract (ETag, If-None-Match) + Delta Merge Strategie
+ - Optional: Memory Profiling Ticket (Rückweg zu parallelem Vitest falls machbar)
+ - 3D Graph Map POC implementieren (Feature-Flag `VITE_ENABLE_GRAPH_3D` + Fallback Rendering testen)
+ - Graph-UI Guidelines Markdown anlegen (Interaktionsprinzipien, Node-Typ Farben, Fokus-/Kontext-Modus)
+ - Messpunkte definieren: FPS (≥ 50 Ziel mobil), Initial Payload Budget, Node Count Threshold für Auto-Downgrade
 
 ## Phase 2: Community Features (Sprints 4-6)
 
@@ -73,18 +81,23 @@ Nächste Schritte (kleine PRs):
 - Hub-Directory mit Bewertungen
 - Partner-Integration für Quest-Validierung
 - Lokale Ereignisse und Challenges
+ - 3D/2D Hybrid: Hubs-Verzeichnis als Graph (Hubs ↔ Quests ↔ Regionen) mit Such-/Filter-Overlay (Fallback: tabellarische Liste)
+ - Performance Pass: Level-of-Detail (LOD) Rendering für große Hub-Netze
 
 ### Sprint 05 – Social Layer + Governance V1
 - Peer-to-Peer Quest-Empfehlungen
 - Team-Quests und Gruppenbelohnungen
 - Community-Boards pro Region
 - Governance V1: 12 Rollen definieren, SCL‑Gates, einfache Rollenvergabe-UI
+ - Social Graph Overlay: Kontakte / Peers / Review-Beziehungen als interaktive Netzwerkansicht (ersetzt statische Kontaktliste)
+ - Moderations-/Governance Beziehungsgraph (Rollen-Knoten, Verantwortungs-Kanten)
 
 ### Sprint 06 – Gamification V2 + Rollen-Workflows
 - Fortgeschrittenes Belohnungssystem
 - Seasonal Events und Themenmonate
 - Leaderboards mit Fairness-Fokus
 - Review-Queues mit Audit-Log (Proofs, Content), Eskalation
+ - Leaderboard-zu-Netzwerk Visualisierung (Cluster nach Rolle / Region) + Influenz-Propagations-Preview (Simulation Light)
 
 ## Phase 3: Scale & Polish (Sprints 7-9)
 
@@ -121,6 +134,44 @@ Nächste Schritte (kleine PRs):
 7. Contributor Feedback Loop: Optional Kommentar auf Issue bei Quest-Annahme / Completion (Opt‑in) (Sprint 06)
 
 Status (11.08.2025): Read‑only Adapter in App verdrahtet (Feature‑Flag: VITE_USE_GITHUB_ADAPTER), Repos via VITE_GITHUB_REPOS; Standard: off. Unit+E2E abgedeckt, CI grün. Nächster Meilenstein: selektive Repo‑Verknüpfung und verbesserte Proof‑Semantik.
+
+## Cross-Cutting Initiative: Graph-First UI (Lists → Networks)
+Ziel: Wo immer Beziehungen Mehrwert stiften (Kontakte, Gruppen, Quests, Hubs, Reviews), klassische Listen durch interaktive Graphrepräsentationen (3D bevorzugt, 2D/Listen-Fallback) zu ergänzen oder zu ersetzen.
+
+### Prinzipien
+1. Progressive Enhancement: 3D nur wenn Gerät/Browser-Fähigkeiten (WebGL2, ausreichende FPS) erkannt
+2. Erklärbarkeit: Hover / Fokus zeigt Kanten-Typen (z.B. "reviewed", "belongs_to", "continues", "bridge")
+3. Reduzierte Knotenlast: Virtualisierte/clustered Darstellung > X Nodes (Hierarchie / Community Detection)
+4. A11y-Pfad: Tastatur-Navigation (Tab sequence der fokussierbaren Nodes) + ARIA-Region mit Listen-Äquivalent
+5. Performance Budgets: Initial < 120KB gzipped Graph-UI Bundle; Mobile LCP < 2.5s
+
+### Phasen
+- POC (Sprint 03): Map 3D Graph (User/Quest/Hub) + Fallback
+- Hybrid (Sprint 04): Hub Directory Graph Overlay + Filter
+- Social Expansion (Sprint 05): Kontakte & Peer-Review Beziehungen
+- Governance (Sprint 05/06): Rollen & Moderationsnetz
+- Gamification (Sprint 06+): Influence / Propagation Simulation Light
+
+### Technologiekandidat
+Primär: react-force-graph-3d (Three.js basierend) – Gründe: Stabil etablierte API, Force-Engine konfigurierbar, VR/AR Erweiterbarkeit. Alternativen im Evaluations-Doc: sigma.js (2D), d3-force + custom Three Layer (höherer Wartungsaufwand), vivagraph.
+
+### Tasks (laufend)
+- Library Evaluation Report (FPS Benchmarks, Memory Profiling)
+- Fallback Strategy Component (GraphFallbackList)
+- Node/Edge Typing Schema (shared/types/graph) Erweiterung (z.B. edge.reason, weight, diversityScore)
+- Color & Shape Mapping (A11y Kontrast, Color-Blind Paletten)
+- Interaction Contracts: click (focus), double-click (expand neighbors), long-press (mobile radial menu)
+- Telemetry Events: graph_node_focus, graph_edge_explain
+
+### Risiken
+- Mobile GPU Throttling → dynamische Quality Scaling nötig
+- A11y Komplexität → Muss immer semantisch äquivalente Liste bieten
+- Potentiale kognitive Überlast → Progressive Disclosure (Depth Limits, Fokus-Modus)
+
+### Erfolgskriterien (Metriken)
+- ≥ 95% der unterstützten Geräte liefern > 45 FPS bei 200 Knoten / 400 Kanten
+- Nutzer verstehen (Umfrage) "Warum sehe ich diese Empfehlung" (>80% Zustimmung)
+- Kein Anstieg von Abbruchraten in den Flows (Quest-Annahme) nach Graph-Einführung
 
 ## Meilensteine
 - **M1** (Ende Sprint 3): MVP lauffähig, erste 100 Beta-Tester

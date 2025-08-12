@@ -15,7 +15,7 @@ describe('Me route – Link GitHub stub', () => {
     render(<Me />);
     expect(screen.getByText(/SCL/i)).toBeInTheDocument();
     expect(screen.getByText(/Nicht verknüpft/i)).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: /GitHub verknüpfen/i })).toBeInTheDocument();
+  expect(screen.getByRole('button', { name: /GitHub verknüpfen|Link GitHub/i })).toBeInTheDocument();
   });
 
   it('when clicking Link GitHub, persists githubLinked=true and scl>=4', async () => {

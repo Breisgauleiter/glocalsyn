@@ -1,5 +1,6 @@
 import { useMemo, useState } from 'react';
 import { useProfile } from '../features/profile/profileStore';
+import { t } from '../i18n';
 
 export function Me() {
   const { profile, update } = useProfile();
@@ -30,24 +31,38 @@ export function Me() {
     update({ githubRepos: repos });
   }
 
+  // Default repos from env (feature flag context) to assist selection UI
+  const envAny = (import.meta as any)?.env ?? (typeof process !== 'undefined' ? (process.env as any) : {});
+  const reposRaw = envAny.VITE_GITHUB_REPOS as string | undefined;
+  const defaultRepos = (reposRaw ?? '').split(',').map((s: string) => s.trim()).filter(Boolean);
+  const selected = new Set((profile.githubRepos ?? []).length ? profile.githubRepos : defaultRepos);
+
+  function toggleRepo(repo: string) {
+    const current = new Set(profile.githubRepos ?? []);
+    if (current.has(repo)) current.delete(repo); else current.add(repo);
+    const arr = Array.from(current);
+    update({ githubRepos: arr });
+    setReposInput(arr.join(', '));
+  }
+
   return (
     <section aria-labelledby="me-title" className="container stack" style={{ padding: 16 }}>
-      <h1 id="me-title">Ich</h1>
-      <p>Profil & Einstellungen.</p>
+      <h1 id="me-title">{t('me.title')}</h1>
+      <p>{t('me.description')}</p>
 
       <div className="glass-card" role="group" aria-labelledby="account-section-title">
-        <h2 id="account-section-title" className="h3">Account</h2>
+    <h2 id="account-section-title" className="h3">{t('me.account.section')}</h2>
         <dl className="stack" style={{ gap: 8 }}>
           <div>
-            <dt className="muted">SCL</dt>
+      <dt className="muted">{t('me.account.scl')}</dt>
             <dd><strong aria-live="polite">{profile.scl ?? 1}</strong></dd>
           </div>
           <div>
-            <dt className="muted">GitHub</dt>
+      <dt className="muted">{t('me.account.github')}</dt>
             <dd aria-live="polite">{profile.githubLinked ? 'Verknüpft' : 'Nicht verknüpft'}</dd>
           </div>
-          <div>
-            <dt className="muted">Badges</dt>
+      <div>
+    <dt className="muted">{t('me.account.badges')}</dt>
             <dd aria-live="polite" data-testid="badge-list">{(profile.badges && profile.badges.length > 0) ? profile.badges.join(', ') : '—'}</dd>
           </div>
         </dl>
@@ -57,18 +72,18 @@ export function Me() {
             type="button"
             className="btn btn-primary"
             onClick={linkGithub}
-            aria-label="GitHub verknüpfen"
+            aria-label={t('me.github.link')}
             data-testid="link-github"
           >
-            GitHub verknüpfen
+            {t('me.github.link')}
           </button>
         ) : (
           <>
-            <p className="muted" aria-live="polite">GitHub ist verknüpft. Danke!</p>
+            <p className="muted" aria-live="polite">{t('me.github.linkedThanks')}</p>
             <form onSubmit={saveRepos} className="stack" style={{ gap: 8 }} aria-label="GitHub Einstellungen">
               <fieldset style={{ border: 'none', padding: 0, margin: 0 }}>
-                <legend className="muted" style={{ fontWeight: 700, marginBottom: 8 }}>GitHub Einstellungen</legend>
-                <label htmlFor="repos-input" className="muted" style={{ display: 'block', marginBottom: 4 }}>Repos <span style={{ fontWeight: 400 }}>(owner/name, komma-separiert)</span></label>
+                <legend className="muted" style={{ fontWeight: 700, marginBottom: 8 }}>{t('me.github.settings.legend')}</legend>
+                <label htmlFor="repos-input" className="muted" style={{ display: 'block', marginBottom: 4 }}>{t('me.github.repos.label')}</label>
                 <input
                   id="repos-input"
                   name="repos"
@@ -84,9 +99,36 @@ export function Me() {
                 {repoError ? (
                   <p id="repos-error" role="alert" className="error" style={{ color: '#FF4F4F', marginTop: 4, fontWeight: 600, background: 'rgba(255,79,79,0.08)', borderRadius: 6, padding: '4px 8px' }}>{repoError}</p>
                 ) : null}
-                <small id="repos-help" className="muted" style={{ display: 'block', marginBottom: 8 }}>Diese Auswahl überschreibt die Standard-Repo-Liste. Leer lassen = Standard verwenden.</small>
+                <small id="repos-help" className="muted" style={{ display: 'block', marginBottom: 8 }}>{t('me.github.repos.help')}</small>
 
-                <label htmlFor="state-input" className="muted" style={{ display: 'block', marginBottom: 4 }}>Issue-Status</label>
+                <div className="stack" style={{ gap: 4 }} aria-label={t('me.github.repoSelection.title')}>
+                  <strong className="muted" style={{ fontSize: '0.85rem' }}>{t('me.github.repoSelection.title')}</strong>
+                  {defaultRepos.length === 0 ? (
+                    <span className="muted" data-testid="repo-empty">{t('me.github.repoSelection.empty')}</span>
+                  ) : (
+                    <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexWrap: 'wrap', gap: 8 }}>
+                      {defaultRepos.map(r => {
+                        const isSel = selected.has(r);
+                        return (
+                          <li key={r}>
+                            <label style={{ display: 'flex', alignItems: 'center', gap: 4, cursor: 'pointer', fontSize: '0.8rem' }}>
+                              <input
+                                type="checkbox"
+                                checked={isSel}
+                                onChange={() => toggleRepo(r)}
+                                aria-checked={isSel}
+                                aria-label={r}
+                              />
+                              <span style={{ padding: '2px 6px', borderRadius: 6, background: isSel ? 'rgba(125,211,252,0.25)' : 'rgba(255,255,255,0.06)', border: '1px solid rgba(125,211,252,0.5)' }}>{r}</span>
+                            </label>
+                          </li>
+                        );
+                      })}
+                    </ul>
+                  )}
+                </div>
+
+                <label htmlFor="state-input" className="muted" style={{ display: 'block', marginBottom: 4 }}>{t('me.github.issueState')}</label>
                 <select
                   id="state-input"
                   className="input"
@@ -99,7 +141,7 @@ export function Me() {
                   <option value="all">all</option>
                 </select>
 
-                <label htmlFor="labels-input" className="muted" style={{ display: 'block', marginBottom: 4 }}>Labels <span style={{ fontWeight: 400 }}>(komma-separiert)</span></label>
+                <label htmlFor="labels-input" className="muted" style={{ display: 'block', marginBottom: 4 }}>{t('me.github.labels')}</label>
                 <input
                   id="labels-input"
                   name="labels"
@@ -112,7 +154,7 @@ export function Me() {
                   style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid var(--accent)', borderRadius: 10, color: 'var(--text)' }}
                 />
 
-                <label htmlFor="token-input" className="muted" style={{ display: 'block', marginBottom: 4 }}>GitHub Token <span style={{ fontWeight: 400 }}>(optional)</span></label>
+                <label htmlFor="token-input" className="muted" style={{ display: 'block', marginBottom: 4 }}>{t('me.github.token')}</label>
                 <input
                   id="token-input"
                   name="token"
@@ -135,7 +177,7 @@ export function Me() {
                       update({ githubIssueState: stateInput, githubLabels: labels, githubToken: tokenInput || undefined });
                     }}
                   >
-                    <span role="img" aria-label="Speichern" style={{ marginRight: 6 }}>💾</span> Speichern
+                    <span role="img" aria-label={t('me.github.save')} style={{ marginRight: 6 }}>💾</span> {t('me.github.save')}
                   </button>
                 </div>
               </fieldset>

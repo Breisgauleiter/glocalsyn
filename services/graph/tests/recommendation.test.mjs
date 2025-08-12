@@ -10,4 +10,5 @@ const objs = [
 const edges = [ { _from: 'graph_objects/user1', _to: 'graph_objects/hub2', type: 'recommends' } ];
 const res = recommendInMemory(objs, edges, 'user1');
 assert.strictEqual(res.length, 1);
-assert.strictEqual(res[0]._key, 'hub2');
+assert.strictEqual(res[0].node._key, 'hub2');
+assert.ok(Array.isArray(res[0].reasons));
