@@ -68,7 +68,7 @@ Nächste Schritte (kleine PRs):
  - Pagination & Limit + defensive Rate-Limit-Handhabung im GitHub Adapter
  - Semantik: Vorbereitung PR→Issue Close Mapping (Proof Voraussetzung ab SCL ≥ 4, noch read‑only)
  - I18n: DE/EN für neue Graph/Empfehlungs-UI Strings
- - OAuth2 Spezifikation konkretisieren (Start/Callback Endpoints, State, Token Persist Layer) → Übergang Sprint 04
+ - OAuth2 Spezifikation konkretisieren (Start/Callback Endpoints, State, Token Persist Layer) → Übergang Sprint 04 [DELIVERED: Spec `docs/OAUTH2_GITHUB_SPEC.md`]
  - Sync Pipeline v1 Draft: Polling Contract (ETag, If-None-Match) + Delta Merge Strategie
  - Optional: Memory Profiling Ticket (Rückweg zu parallelem Vitest falls machbar)
  - 3D Graph Map POC implementieren (Feature-Flag `VITE_ENABLE_GRAPH_3D` + Fallback Rendering testen)
