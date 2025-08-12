@@ -1888,10 +1888,13 @@ packages:
   jackspeak@3.4.3:
     resolution: {integrity: sha512-OGlZQpz2yfahA/Rd1Y8Cd9SIEsqvXkLVoSw/cgwhnhFMDbsQFeZYoJJ7bIZBS9BcamUW96asq/npPWugM+RQBw==}
 
+<<<<<<< HEAD
   jerrypick@1.1.2:
     resolution: {integrity: sha512-YKnxXEekXKzhpf7CLYA0A+oDP8V0OhICNCr5lv96FvSsDEmrb0GKM776JgQvHTMjr7DTTPEVv/1Ciaw0uEWzBA==}
     engines: {node: '>=12'}
 
+=======
+>>>>>>> d76c017 (feat(app): recommendations placeholder + repo selection & test infra hardening)
   js-tokens@4.0.0:
     resolution: {integrity: sha512-RdJUflcE3cUzKiMqQgsCu06FPu9UdIJO0beYbPhHN4k6apgJtifcoCtT9bcxOpYBtpD2kCM6Sbzg4CausW/PKQ==}
 
@@ -2310,12 +2313,15 @@ packages:
   react-is@18.3.1:
     resolution: {integrity: sha512-/LLMVyas0ljjAtoYiPqYiL8VWXzUUdThrmU5+n20DZv+a+ClRoevUzw5JxU+Ieh5/c87ytoTBV9G1FiKfNJdmg==}
 
+<<<<<<< HEAD
   react-kapsule@2.5.7:
     resolution: {integrity: sha512-kifAF4ZPD77qZKc4CKLmozq6GY1sBzPEJTIJb0wWFK6HsePJatK3jXplZn2eeAt3x67CDozgi7/rO8fNQ/AL7A==}
     engines: {node: '>=12'}
     peerDependencies:
       react: '>=16.13.1'
 
+=======
+>>>>>>> d76c017 (feat(app): recommendations placeholder + repo selection & test infra hardening)
   react-refresh@0.17.0:
     resolution: {integrity: sha512-z6F7K9bV85EfseRCp2bzrpyQ0Gkw1uLoCel9XBVWPg/TjRj94SkJzUTGfOa4bs7iJvBWtQG0Wq7wnI0syw3EBQ==}
     engines: {node: '>=0.10.0'}
@@ -4854,8 +4860,11 @@ snapshots:
     optionalDependencies:
       '@pkgjs/parseargs': 0.11.0
 
+<<<<<<< HEAD
   jerrypick@1.1.2: {}
 
+=======
+>>>>>>> d76c017 (feat(app): recommendations placeholder + repo selection & test infra hardening)
   js-tokens@4.0.0: {}
 
   js-tokens@9.0.1: {}
@@ -5275,11 +5284,14 @@ snapshots:
 
   react-is@18.3.1: {}
 
+<<<<<<< HEAD
   react-kapsule@2.5.7(react@18.3.1):
     dependencies:
       jerrypick: 1.1.2
       react: 18.3.1
 
+=======
+>>>>>>> d76c017 (feat(app): recommendations placeholder + repo selection & test infra hardening)
   react-refresh@0.17.0: {}
 
   react-router-dom@6.30.1(react-dom@18.3.1(react@18.3.1))(react@18.3.1):

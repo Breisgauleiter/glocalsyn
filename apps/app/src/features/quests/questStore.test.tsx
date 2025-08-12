@@ -70,7 +70,6 @@ test('photo proof: accepted -> submitted (pending review) with seeded data', () 
   expect(state.proofs?.[id]?.data?.photo).toBe(dataUrl);
   expect(state.proofs?.[id]?.status).toBe('pending');
 });
- 
 test('approve pending proof: transitions to completed & adds reviewer badge', () => {
   // Seed profile so XP / badges updates persist
   localStorage.setItem('profile', JSON.stringify({ githubLinked: false, scl: 1, xp: 0, badges: [] }));
