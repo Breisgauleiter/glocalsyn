@@ -15,8 +15,9 @@
   "test": "pnpm build && node --test dist" 
   },
   "dependencies": {
-  "arangojs": "^9.0.0",
-  "fastify": "^4.28.1"
+    "arangojs": "^9.0.0",
+    "fastify": "^4.28.1",
+    "@syntopia/types": "workspace:*"
   },
   "devDependencies": {
   "eslint": "^8.57.0",

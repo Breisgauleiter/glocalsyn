@@ -5,6 +5,8 @@
  */
 import { Database, aql } from 'arangojs';
 import Fastify from 'fastify';
+// Import shared graph types via workspace package (barrel export)
+import type { GraphObject as SharedGraphObject, GraphEdge as SharedGraphEdge, GraphRecommendation } from '@syntopia/types';
 
 interface EnvConfig {
   url: string;
@@ -50,21 +52,10 @@ export async function ensureCollections(db: Database) {
   }
 }
 
-export interface GraphObject {
-  _key?: string;
-  type: 'user' | 'hub' | 'quest';
-  name: string;
-  [k: string]: any;
-}
+// Local GraphObject mirrors shared but allows optional _key before persistence.
+export interface GraphObject extends Omit<SharedGraphObject, '_key'> { _key?: string; type: SharedGraphObject['type']; name: string; }
 
-export interface GraphEdge {
-  _key?: string;
-  _from: string; // e.g. graph_objects/user123
-  _to: string;   // e.g. graph_objects/hub456
-  type: 'follows' | 'joins' | 'recommends';
-  createdAt: number;
-  [k: string]: any;
-}
+export interface GraphEdge extends Omit<SharedGraphEdge, '_from' | '_to' | 'type' | 'createdAt'> { _key?: string; _from: string; _to: string; type: SharedGraphEdge['type']; createdAt: number; }
 
 export async function upsertObject(db: Database, obj: GraphObject) {
   const col = db.collection(COLLECTIONS.objects);
@@ -82,8 +73,7 @@ export async function createEdge(db: Database, edge: GraphEdge) {
   return meta._key;
 }
 
-export async function getRecommendations(db: Database, userObjectKey: string, limit = 10) {
-  // Recommends = outward edges of type recommends or follows → objects
+export async function getRecommendations(db: Database, userObjectKey: string, limit = 10): Promise<GraphRecommendation[]> {
   const cursor = await db.query(aql`
     FOR e IN ${db.collection(COLLECTIONS.edges)}
       FILTER e._from == CONCAT(${COLLECTIONS.objects}/, ${userObjectKey})
@@ -91,20 +81,32 @@ export async function getRecommendations(db: Database, userObjectKey: string, li
       FOR o IN ${db.collection(COLLECTIONS.objects)}
         FILTER o._id == e._to
         LIMIT ${limit}
-        RETURN o
+        RETURN { node: o, reasons: [ { code: 'social_proof', explanation: 'follow/recommend edge' } ] }
   `);
   return cursor.all();
 }
 
 // Pure in-memory recommendation helper (for tests / fallback)
 export interface InMemoryEdge { _from: string; _to: string; type: GraphEdge['type']; }
-export function recommendInMemory(objects: GraphObject[], edges: InMemoryEdge[], userKey: string, limit = 10): GraphObject[] {
+export function recommendInMemory(objects: GraphObject[], edges: InMemoryEdge[], userKey: string, limit = 10): GraphRecommendation[] {
   const fromIdPrefix = `${COLLECTIONS.objects}/${userKey}`;
   const targets = edges
     .filter(e => e._from === fromIdPrefix && (e.type === 'recommends' || e.type === 'follows'))
     .map(e => e._to);
   const targetSet = new Set(targets);
-  return objects.filter(o => targetSet.has(`${COLLECTIONS.objects}/${o._key}`)).slice(0, limit);
+  return objects
+    .filter(o => targetSet.has(`${COLLECTIONS.objects}/${o._key}`))
+    .slice(0, limit)
+  .map(node => ({ node: node as SharedGraphObject, reasons: [{ code: 'social_proof', explanation: 'in-memory edge' }] }));
+}
+
+// In-memory map snapshot (later replaced by DB query)
+export function buildMapSnapshot(objects: GraphObject[], edges: InMemoryEdge[], limit = 200) {
+  return {
+    nodes: objects.slice(0, limit),
+    edges: edges.slice(0, limit * 2),
+    meta: { generatedAt: Date.now(), nodeCount: objects.length, edgeCount: edges.length }
+  };
 }
 
 export async function bootstrap() {
@@ -130,7 +132,8 @@ export async function bootstrap() {
     // Start HTTP API
     const app = Fastify({ logger: false });
     app.get('/health', async () => ({ ok: true }));
-    app.get('/recommendations/:userKey', async (req, reply) => {
+    // New unified path namespace /graph
+    app.get('/graph/recommendations/:userKey', async (req, reply) => {
       const { userKey } = req.params as any;
       try {
         const data = await getRecommendations(db, userKey, 10);
@@ -139,6 +142,23 @@ export async function bootstrap() {
         reply.code(500);
         return { error: (e as Error).message };
       }
+    });
+    app.get('/graph/map-snapshot', async () => {
+      // Temporary light query: first N nodes + no heavy joins
+      const cursor = await db.query(aql`
+        FOR o IN ${db.collection(COLLECTIONS.objects)}
+          LIMIT 200
+          RETURN o
+      `);
+      const nodes: GraphObject[] = await cursor.all();
+      // Edges (bounded)
+      const edgeCursor = await db.query(aql`
+        FOR e IN ${db.collection(COLLECTIONS.edges)}
+          LIMIT 400
+          RETURN e
+      `);
+      const edges = await edgeCursor.all();
+      return { nodes, edges, meta: { generatedAt: Date.now(), nodeCount: nodes.length, edgeCount: edges.length } };
     });
     const port = Number(process.env.GRAPH_PORT || 4050);
     await app.listen({ port, host: '0.0.0.0' });
