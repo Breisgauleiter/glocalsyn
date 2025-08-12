@@ -36,6 +36,8 @@ The Playwright config will auto-start the dev server if needed.
 pnpm --filter @syntopia/app test
 ```
 
+Note on images/canvas in unit tests: jsdom lacks full Canvas APIs. Minimal mocks live in `apps/app/src/setupTests.ts` to avoid errors. Prefer seeding state for photo flows in unit tests and verify real uploads with Playwright E2E.
+
 ## Scripts reference (apps/app)
 - `dev` – start Vite
 - `build` – build for production
@@ -56,5 +58,74 @@ To enable read-only GitHub issues as a quest source (for users with SCL ≥ 4 an
 Notes:
 - Adapter is read-only and best-effort. On errors it falls back to the baseline mock.
 - The dummy onboarding quest remains; when enabled, GitHub quests are added on top.
-- Per-user Repo-Auswahl: Nach dem Verknüpfen kann jede:r in "Ich" eine Repo-Liste (owner/name, komma-separiert) speichern. Diese überschreibt `VITE_GITHUB_REPOS`. Leer lassen = Standard verwenden.
- - Zusätzlich pro Nutzer: Issue-Status (open/closed/all), Labels (komma-separiert) und optional ein persönliches Token können in "Ich" gesetzt werden. Diese Einstellungen beeinflussen nur den lokalen Client (read-only).
+
+## Per-user GitHub settings (optional)
+
+Nach dem Verknüpfen kann jede:r in "Ich" eine Repo-Liste (owner/name, komma-separiert) speichern. Diese überschreibt `VITE_GITHUB_REPOS`. Leer lassen = Standard verwenden.
+Zusätzlich pro Nutzer: Issue-Status (open/closed/all), Labels (komma-separiert) und optional ein persönliches Token können in "Ich" gesetzt werden. Diese Einstellungen beeinflussen nur den lokalen Client (read-only).
+
+
+---
+
+# Quests & Proofs
+
+- Types: `check_in` (alias `complete`), `text_note`, `link`, `photo`, `peer_confirm`, `github_pr`.
+- Instant: `check_in/complete` completes a quest immediately on submit.
+- Reviewed: others are submitted and appear in the Review Queue until approved.
+- XP mapping: 5/8/8/9/10/15 (same order as above).
+
+Photo proofs are downscaled client-side and stored as Data URLs in local storage (on-device). If sync is added later, document privacy and size constraints.
+
+---
+
+# Demo Guide: Syntopia Minimal Slice
+
+This guide walks through the main flows for onboarding and demo purposes. Add screenshots (PNG/JPG) in the indicated places for visual reference.
+
+## 1. App Shell & Navigation
+- **Tabs:** Home, Quests, Map, Hubs, Ich (Profile) at the bottom.
+- **Screenshot:**
+	![App Shell Tabs](../apps/app/public/demo-app-shell.png)
+
+## 2. Login & Profile Wizard
+- On first launch, user is prompted to log in and set up profile (Name, Region).
+- **Screenshot:**
+	![Login & Profile Wizard](../apps/app/public/demo-profile-wizard.png)
+
+## 3. Dummy Quest Flow
+- Quests tab shows a dummy quest.
+- User can view, accept, and mark quest as done.
+- **Screenshot:**
+	![Dummy Quest](../apps/app/public/demo-dummy-quest.png)
+
+## 4. Me/Profile Settings
+- "Ich" tab shows SCL, GitHub link status, and settings form for repos, issue state, labels, and token.
+- Accessible labels, error handling, and cosmic style.
+- **Screenshot:**
+	![Profile Settings](../apps/app/public/demo-profile-settings.png)
+
+## 5. GitHub Adapter (optional)
+- If enabled, user can link GitHub and see issues as quests (SCL ≥ 4).
+- Per-user repo selection, issue state, labels, and token can be set in "Ich".
+- **Screenshot:**
+	![GitHub Quests](../apps/app/public/demo-github-quests.png)
+
+## 6. Accessibility & Mobile-first
+- All forms have labels, focus states, and error messages.
+- Layout adapts to mobile screens.
+- **Screenshot:**
+	![Mobile Accessibility](../apps/app/public/demo-mobile-accessibility.png)
+
+---
+
+## How to test
+
+Unit tests:
+```sh
+pnpm --filter @syntopia/app test
+```
+E2E tests:
+```sh
+pnpm --filter @syntopia/app e2e
+```
+All tests should pass locally and in CI.

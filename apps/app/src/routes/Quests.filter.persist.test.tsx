@@ -1,4 +1,6 @@
-import { fireEvent, render, screen } from '@testing-library/react';
+import { render, screen } from '@testing-library/react';
+import { click } from '../test/testActions';
+import { MemoryRouter } from 'react-router-dom';
 import { Quests } from './Quests';
 
 describe('Quests filter persistence', () => {
@@ -10,26 +12,26 @@ describe('Quests filter persistence', () => {
 
   it('loads initial filter from localStorage', () => {
     localStorage.setItem('quests.filter', 'github');
-    render(<Quests />);
+  render(<MemoryRouter><Quests /></MemoryRouter>);
     const githubRadio = screen.getByTestId('filter-github') as HTMLInputElement;
-    expect(githubRadio.checked).toBe(true);
+    expect(githubRadio).toBeChecked();
   });
 
-  it('persists filter selection to localStorage', () => {
-    render(<Quests />);
-    const localRadio = screen.getByTestId('filter-local');
-    fireEvent.click(localRadio);
+  it('persists filter selection to localStorage', async () => {
+  render(<MemoryRouter><Quests /></MemoryRouter>);
+  const localRadio = screen.getByTestId('filter-local');
+  await click(localRadio);
     expect(localStorage.getItem('quests.filter')).toBe('local');
   });
 
   it('inline CTA links GitHub from empty state and GitHub quests appear', async () => {
     // ensure profile is NOT linked initially
     localStorage.setItem('profile', JSON.stringify({ githubLinked: false, scl: 1 }));
-    render(<Quests />);
+  render(<MemoryRouter><Quests /></MemoryRouter>);
     // Switch to GitHub filter (empty state visible)
-    fireEvent.click(screen.getByTestId('filter-github'));
+  await click(screen.getByTestId('filter-github'));
     const cta = await screen.findByTestId('empty-link-github');
-    fireEvent.click(cta);
+  await click(cta);
     // GitHub quest becomes visible
     await screen.findByTestId('source-badge-github');
     // Filter persisted as github (radio onChange persists)

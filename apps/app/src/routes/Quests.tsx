@@ -1,10 +1,11 @@
 import { useQuestStore } from '../features/quests/questStore';
+import { Link } from 'react-router-dom';
 import { useProfile } from '../features/profile/profileStore';
 import { useEffect, useRef, useState } from 'react';
 
 export function Quests() {
   const { profile, update } = useProfile();
-  const { quests, status, accept, complete } = useQuestStore(profile);
+  const { quests, status, accept, start, submit, markCompleted } = useQuestStore(profile);
   const unlocked = profile.githubLinked && (profile.scl ?? 1) >= 4;
   const [filter, setFilter] = useState<'all' | 'github' | 'local'>(() => {
     const stored = localStorage.getItem('quests.filter');
@@ -86,7 +87,8 @@ export function Quests() {
           data-testid={`quest-item-${q.source?.kind ?? 'local'}`}
           style={q.source?.kind === 'github_issue' && highlightUnlocked ? { outline: '2px solid rgba(0, 200, 255, 0.8)' } : undefined}
         >
-          <h2 id={`quest-title-${q.id}`} className="h1">{q.title}</h2>
+          <h2 id={`quest-title-${q.id}`} className="h1"><Link to={`/quests/${q.id}`}>{q.title}</Link></h2>
+          <p className="p" role="note">Kategorie: <strong>{q.category}</strong>{q.effortMinutes ? ` • ~${q.effortMinutes} min` : ''}</p>
           <p id={`quest-desc-${q.id}`} className="p">{q.description}</p>
           <p className="p" role="note">
             Quelle: <small data-testid={`source-badge-${q.source?.kind === 'github_issue' ? 'github' : 'local'}`}>{q.source?.kind === 'github_issue' ? 'GitHub' : 'Lokal'}</small>
@@ -101,9 +103,24 @@ export function Quests() {
             <button className="btn btn-primary" aria-label="Quest annehmen" onClick={() => accept(q.id)}>Annehmen</button>
           )}
           {status(q.id) === 'accepted' && (
-            <button className="btn btn-primary" aria-label="Quest als erledigt markieren" onClick={() => complete(q.id)}>Erledigt</button>
+            <div className="row" style={{ gap: 8 }}>
+              {(q.proof?.type === 'complete' || q.proof?.type === 'check_in') ? (
+                <button className="btn btn-primary" aria-label="Quest abschließen" onClick={() => submit(q.id)}>Abschließen</button>
+              ) : (
+                <button className="btn btn-primary" aria-label="Quest starten" onClick={() => start(q.id)}>Starten</button>
+              )}
+            </div>
           )}
-          {status(q.id) === 'done' && <p role="status">Erledigt! 🎉</p>}
+          {status(q.id) === 'in_progress' && (
+            <button className="btn btn-primary" aria-label="Nachweis einreichen" onClick={() => submit(q.id)}>Nachweis einreichen</button>
+          )}
+          {status(q.id) === 'submitted' && (
+            <div className="row" style={{ gap: 8 }}>
+              <p role="status" className="p">Eingereicht – Prüfung ausstehend</p>
+              <button className="btn" aria-label="Manuell als erledigt markieren" onClick={() => markCompleted(q.id)}>Review OK</button>
+            </div>
+          )}
+          {status(q.id) === 'completed' && <p role="status">Erledigt! 🎉</p>}
         </article>
       ))}
     </section>

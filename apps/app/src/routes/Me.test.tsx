@@ -1,6 +1,7 @@
-import { fireEvent, render, screen } from '@testing-library/react';
+import { render, screen } from '@testing-library/react';
+import { click, type } from '../test/testActions';
 import { Me } from './Me';
-
+ 
 function resetProfile() {
   localStorage.removeItem('profile');
 }
@@ -17,10 +18,10 @@ describe('Me route – Link GitHub stub', () => {
     expect(screen.getByRole('button', { name: /GitHub verknüpfen/i })).toBeInTheDocument();
   });
 
-  it('when clicking Link GitHub, persists githubLinked=true and scl>=4', () => {
+  it('when clicking Link GitHub, persists githubLinked=true and scl>=4', async () => {
     render(<Me />);
     const btn = screen.getByTestId('link-github');
-    fireEvent.click(btn);
+  await click(btn);
 
     const raw = localStorage.getItem('profile');
     expect(raw).toBeTruthy();
@@ -29,13 +30,13 @@ describe('Me route – Link GitHub stub', () => {
     expect(parsed.scl).toBeGreaterThanOrEqual(4);
   });
 
-  it('shows validation error for invalid repo format and does not persist', () => {
+  it('shows validation error for invalid repo format and does not persist', async () => {
     render(<Me />);
     // Link first to reveal settings
-    fireEvent.click(screen.getByTestId('link-github'));
+  await click(screen.getByTestId('link-github'));
     const input = screen.getByLabelText(/Repos \(owner\/name/i);
-    fireEvent.change(input, { target: { value: 'invalid-format' } });
-    fireEvent.click(screen.getByRole('button', { name: /Speichern/i }));
+  await type(input, 'invalid-format');
+  await click(screen.getByRole('button', { name: /Speichern/i }));
     expect(screen.getByRole('alert')).toHaveTextContent('Ungültiges Format');
     const parsed = JSON.parse(localStorage.getItem('profile')!);
     expect(parsed.githubRepos || []).toEqual([]);
