@@ -1,175 +1,39 @@
-/**
- * Graph Service (ArangoDB + TAO model)
- * Minimal bootstrap: connects to ArangoDB (if available) and ensures collections.
- * Safe to run even if DB not reachable (logs warning and exits gracefully).
- */
+/** Clean reimplementation below **/
 import { Database, aql } from 'arangojs';
 import Fastify from 'fastify';
-// Import shared graph types via workspace package (barrel export)
 import type { GraphObject as SharedGraphObject, GraphEdge as SharedGraphEdge, GraphRecommendation } from '@syntopia/types';
 
-interface EnvConfig {
-  url: string;
-  database: string;
-  username?: string;
-  password?: string;
-}
+interface EnvConfig { url: string; database: string; username?: string; password?: string; }
+const loadConfig = (): EnvConfig => ({ url: process.env.ARANGO_URL || 'http://localhost:8529', database: process.env.ARANGO_DB || 'syntopia', username: process.env.ARANGO_USER, password: process.env.ARANGO_PASS });
 
-function loadConfig(): EnvConfig {
-  return {
-    url: process.env.ARANGO_URL || 'http://localhost:8529',
-    database: process.env.ARANGO_DB || 'syntopia',
-    username: process.env.ARANGO_USER,
-    password: process.env.ARANGO_PASS,
-  };
-}
+export interface Collections { objects: string; edges: string; }
+const COLLECTIONS: Collections = { objects: 'graph_objects', edges: 'graph_edges' };
 
-export interface Collections {
-  objects: string;
-  edges: string;
-}
-
-const COLLECTIONS: Collections = {
-  objects: 'graph_objects',
-  edges: 'graph_edges',
-};
-
-export async function ensureDatabase(db: Database, name: string) {
-  const databases = await db.listDatabases();
-  if (!databases.includes(name)) {
-    await db.createDatabase(name);
-  }
-}
-
-export async function ensureCollections(db: Database) {
-  const existing = await db.listCollections();
-  const names = new Set(existing.map(c => c.name));
-  if (!names.has(COLLECTIONS.objects)) {
-    await db.collection(COLLECTIONS.objects).create();
-  }
-  if (!names.has(COLLECTIONS.edges)) {
-    await db.collection(COLLECTIONS.edges).create({ type: 3 }); // 3 = EDGE_COLLECTION
-  }
-}
-
-// Local GraphObject mirrors shared but allows optional _key before persistence.
 export interface GraphObject extends Omit<SharedGraphObject, '_key'> { _key?: string; type: SharedGraphObject['type']; name: string; }
-
 export interface GraphEdge extends Omit<SharedGraphEdge, '_from' | '_to' | 'type' | 'createdAt'> { _key?: string; _from: string; _to: string; type: SharedGraphEdge['type']; createdAt: number; }
 
-export async function upsertObject(db: Database, obj: GraphObject) {
-  const col = db.collection(COLLECTIONS.objects);
-  if (obj._key) {
-    await col.update(obj._key, obj, { keepNull: false });
-    return obj._key;
-  }
-  const meta = await col.save(obj);
-  return meta._key;
-}
+export async function ensureDatabase(db: Database, name: string) { const list = await db.listDatabases(); if (!list.includes(name)) await db.createDatabase(name); }
+export async function ensureCollections(db: Database) { const existing = await db.listCollections(); const names = new Set(existing.map(c => c.name)); if (!names.has(COLLECTIONS.objects)) await db.collection(COLLECTIONS.objects).create(); if (!names.has(COLLECTIONS.edges)) await db.collection(COLLECTIONS.edges).create({ type: 3 }); }
 
-export async function createEdge(db: Database, edge: GraphEdge) {
-  const col = db.collection(COLLECTIONS.edges);
-  const meta = await col.save(edge);
-  return meta._key;
-}
+export async function upsertObject(db: Database, obj: GraphObject) { const col = db.collection(COLLECTIONS.objects); if (obj._key) { await col.update(obj._key, obj, { keepNull: false }); return obj._key; } const meta = await col.save(obj); return meta._key; }
+export async function createEdge(db: Database, edge: GraphEdge) { const col = db.collection(COLLECTIONS.edges); const meta = await col.save(edge); return meta._key; }
 
-export async function getRecommendations(db: Database, userObjectKey: string, limit = 10): Promise<GraphRecommendation[]> {
-  const cursor = await db.query(aql`
-    FOR e IN ${db.collection(COLLECTIONS.edges)}
-      FILTER e._from == CONCAT(${COLLECTIONS.objects}/, ${userObjectKey})
+export async function getRecommendations(db: Database, userObjectKey: string, limit = 10): Promise<GraphRecommendation[]> { const cursor = await db.query(aql`
+  FOR e IN ${db.collection(COLLECTIONS.edges)}
+    FILTER e._from == CONCAT(${COLLECTIONS.objects}/, ${userObjectKey})
       AND (e.type == 'recommends' OR e.type == 'follows')
-      FOR o IN ${db.collection(COLLECTIONS.objects)}
-        FILTER o._id == e._to
-        LIMIT ${limit}
-        RETURN { node: o, reasons: [ { code: 'social_proof', explanation: 'follow/recommend edge' } ] }
-  `);
-  return cursor.all();
-}
+    FOR o IN ${db.collection(COLLECTIONS.objects)}
+      FILTER o._id == e._to
+      LIMIT ${limit}
+      RETURN { node: o, reasons: [ { code: 'social_proof', explanation: 'follow/recommend edge' } ] }
+`); return cursor.all(); }
 
-// Pure in-memory recommendation helper (for tests / fallback)
 export interface InMemoryEdge { _from: string; _to: string; type: GraphEdge['type']; }
-export function recommendInMemory(objects: GraphObject[], edges: InMemoryEdge[], userKey: string, limit = 10): GraphRecommendation[] {
-  const fromIdPrefix = `${COLLECTIONS.objects}/${userKey}`;
-  const targets = edges
-    .filter(e => e._from === fromIdPrefix && (e.type === 'recommends' || e.type === 'follows'))
-    .map(e => e._to);
-  const targetSet = new Set(targets);
-  return objects
-    .filter(o => targetSet.has(`${COLLECTIONS.objects}/${o._key}`))
-    .slice(0, limit)
-  .map(node => ({ node: node as SharedGraphObject, reasons: [{ code: 'social_proof', explanation: 'in-memory edge' }] }));
-}
+export function recommendInMemory(objects: GraphObject[], edges: InMemoryEdge[], userKey: string, limit = 10): GraphRecommendation[] { const fromId = `${COLLECTIONS.objects}/${userKey}`; const targets = new Set(edges.filter(e => e._from === fromId && (e.type === 'recommends' || e.type === 'follows')).map(e => e._to)); return objects.filter(o => targets.has(`${COLLECTIONS.objects}/${o._key}`)).slice(0, limit).map(node => ({ node: node as SharedGraphObject, reasons: [{ code: 'social_proof', explanation: 'in-memory edge' }] })); }
 
-// In-memory map snapshot (later replaced by DB query)
-export function buildMapSnapshot(objects: GraphObject[], edges: InMemoryEdge[], limit = 200) {
-  return {
-    nodes: objects.slice(0, limit),
-    edges: edges.slice(0, limit * 2),
-    meta: { generatedAt: Date.now(), nodeCount: objects.length, edgeCount: edges.length }
-  };
-}
+export function buildMapSnapshot(objects: GraphObject[], edges: InMemoryEdge[], limit = 200) { return { nodes: objects.slice(0, limit), edges: edges.slice(0, limit * 2), meta: { generatedAt: Date.now(), nodeCount: objects.length, edgeCount: edges.length } }; }
 
-export async function bootstrap() {
-  const cfg = loadConfig();
-  const sys = new Database({ url: cfg.url });
-  if (cfg.username && cfg.password) {
-    sys.useBasicAuth(cfg.username, cfg.password);
-  }
-  try {
-    await ensureDatabase(sys, cfg.database);
-  const db = new Database({ url: cfg.url, databaseName: cfg.database });
-    if (cfg.username && cfg.password) db.useBasicAuth(cfg.username, cfg.password);
-    await ensureCollections(db);
-    // Smoke insert example (only if empty)
-    const count = await db.collection(COLLECTIONS.objects).count();
-    if (count.count === 0) {
-      const userKey = await upsertObject(db, { type: 'user', name: 'Demo User' });
-      const hubKey = await upsertObject(db, { type: 'hub', name: 'Demo Hub' });
-      await createEdge(db, { _from: `${COLLECTIONS.objects}/${userKey}`, _to: `${COLLECTIONS.objects}/${hubKey}`, type: 'joins', createdAt: Date.now() });
-      console.log('[graph] Seeded demo objects.');
-    }
-    console.log('[graph] DB Ready.');
-    // Start HTTP API
-    const app = Fastify({ logger: false });
-    app.get('/health', async () => ({ ok: true }));
-    // New unified path namespace /graph
-    app.get('/graph/recommendations/:userKey', async (req, reply) => {
-      const { userKey } = req.params as any;
-      try {
-        const data = await getRecommendations(db, userKey, 10);
-        return { items: data };
-      } catch (e) {
-        reply.code(500);
-        return { error: (e as Error).message };
-      }
-    });
-    app.get('/graph/map-snapshot', async () => {
-      // Temporary light query: first N nodes + no heavy joins
-      const cursor = await db.query(aql`
-        FOR o IN ${db.collection(COLLECTIONS.objects)}
-          LIMIT 200
-          RETURN o
-      `);
-      const nodes: GraphObject[] = await cursor.all();
-      // Edges (bounded)
-      const edgeCursor = await db.query(aql`
-        FOR e IN ${db.collection(COLLECTIONS.edges)}
-          LIMIT 400
-          RETURN e
-      `);
-      const edges = await edgeCursor.all();
-      return { nodes, edges, meta: { generatedAt: Date.now(), nodeCount: nodes.length, edgeCount: edges.length } };
-    });
-    const port = Number(process.env.GRAPH_PORT || 4050);
-    await app.listen({ port, host: '0.0.0.0' });
-    console.log(`[graph] HTTP API listening on :${port}`);
-  } catch (err) {
-    console.warn('[graph] Bootstrap skipped (Arango unreachable?):', (err as Error).message);
-  }
-}
+export async function bootstrap() { const cfg = loadConfig(); const sys = new Database({ url: cfg.url }); if (cfg.username && cfg.password) sys.useBasicAuth(cfg.username, cfg.password); try { await ensureDatabase(sys, cfg.database); const db = new Database({ url: cfg.url, databaseName: cfg.database }); if (cfg.username && cfg.password) db.useBasicAuth(cfg.username, cfg.password); await ensureCollections(db); const count = await db.collection(COLLECTIONS.objects).count(); if (count.count === 0) { const u = await upsertObject(db, { type: 'user', name: 'Demo User' }); const h = await upsertObject(db, { type: 'hub', name: 'Demo Hub' }); await createEdge(db, { _from: `${COLLECTIONS.objects}/${u}`, _to: `${COLLECTIONS.objects}/${h}`, type: 'joins', createdAt: Date.now() }); } const app = Fastify({ logger: false }); app.get('/health', async () => ({ ok: true })); app.get('/graph/recommendations/:userKey', async (req, reply) => { const { userKey } = req.params as any; try { return { items: await getRecommendations(db, userKey, 10) }; } catch (e) { reply.code(500); return { error: (e as Error).message }; } }); app.get('/graph/map-snapshot', async () => { const nodes: GraphObject[] = await (await db.query(aql`FOR o IN ${db.collection(COLLECTIONS.objects)} LIMIT 200 RETURN o`)).all(); const edges = await (await db.query(aql`FOR e IN ${db.collection(COLLECTIONS.edges)} LIMIT 400 RETURN e`)).all(); return { nodes, edges, meta: { generatedAt: Date.now(), nodeCount: nodes.length, edgeCount: edges.length } }; }); const port = Number(process.env.GRAPH_PORT || 4050); await app.listen({ port, host: '0.0.0.0' }); console.log(`[graph] HTTP API listening on :${port}`); } catch (err) { console.warn('[graph] Bootstrap skipped:', (err as Error).message); } }
 
-// Node ESM: emulate import.meta.main
-const isMain = process.argv[1] && process.argv[1].endsWith('src/index.ts');
-if (isMain) {
-  bootstrap();
-}
+if (process.argv[1] && process.argv[1].endsWith('src/index.ts')) bootstrap();
+

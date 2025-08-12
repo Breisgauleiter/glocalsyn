@@ -20,7 +20,7 @@ describe('Me route – Link GitHub stub', () => {
 
   it('when clicking Link GitHub, persists githubLinked=true and scl>=4', async () => {
     render(<Me />);
-  const btn = screen.getByTestId('link-github');
+    const btn = screen.getByTestId('link-github');
   await click(btn);
 
     const raw = localStorage.getItem('profile');

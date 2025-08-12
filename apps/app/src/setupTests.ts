@@ -22,7 +22,6 @@ if (typeof HTMLCanvasElement !== 'undefined') {
 import { afterEach } from 'vitest';
 import { cleanup } from '@testing-library/react';
 afterEach(() => {
-	// Unmount rendered trees first so JSDOM nodes can be GC'd
 	try { cleanup(); } catch { /* ignore */ }
 	try { localStorage.clear(); sessionStorage.clear(); } catch { /* ignore */ }
 	if (typeof globalThis.gc === 'function') {
