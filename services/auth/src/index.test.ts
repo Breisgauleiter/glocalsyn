@@ -2,6 +2,7 @@ import assert from 'node:assert';
 import test from 'node:test';
 import { Database } from 'arangojs';
 import { createUser, ensureUserCollection, USER_COLLECTION, projectUserToGraph } from './user.js';
+import { start } from './index.js';
 
 const url = process.env.ARANGO_URL || 'http://localhost:8529';
 const database = process.env.ARANGO_DB || 'syntopia';
@@ -38,4 +39,16 @@ test('projectUserToGraph idempotent', async () => {
   await projectUserToGraph(db, user);
   await projectUserToGraph(db, user);
   assert.ok(user._key);
+});
+
+test('session cookie set and /me returns user', async () => {
+  const app = await start();
+  const create = await app.inject({ method: 'POST', url: '/dev/create-user', payload: { displayName: 'SessUser' } });
+  assert.equal(create.statusCode, 200);
+  const setCookie = create.headers['set-cookie'];
+  assert.ok(setCookie && setCookie.includes('sid='));
+  const me = await app.inject({ method: 'GET', url: '/me', headers: { cookie: setCookie as string } });
+  assert.equal(me.statusCode, 200);
+  const body = me.json();
+  assert.ok(body.user.id);
 });

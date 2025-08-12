@@ -1,6 +1,7 @@
 import Fastify from 'fastify';
 import { Database } from 'arangojs';
 import { ensureUserCollection, createUser, USER_COLLECTION } from './user.js';
+import { createSession, getSession, serializeSessionCookie, parseCookie } from './session.js';
 
 interface EnvCfg { url: string; database: string; user?: string; pass?: string; }
 function load(): EnvCfg { return { url: process.env.ARANGO_URL || 'http://localhost:8529', database: process.env.ARANGO_DB || 'syntopia', user: process.env.ARANGO_USER, pass: process.env.ARANGO_PASS }; }
@@ -24,11 +25,26 @@ export async function start() {
     if (process.env.NODE_ENV === 'production') { reply.code(403); return { error: 'forbidden' }; }
     const body: any = (req as any).body || {};
     const user = await createUser(db, { displayName: body.displayName, locale: body.locale });
+    const sess = createSession(user._key);
+    reply.header('Set-Cookie', serializeSessionCookie(sess.id));
     return { user };
+  });
+  app.post('/dev/logout', async (req, reply) => {
+    const cookies = parseCookie((req.headers as any)['cookie']);
+    if (cookies.sid) { reply.header('Set-Cookie', 'sid=; Path=/; Max-Age=0; HttpOnly; SameSite=Lax'); }
+    return { ok: true };
   });
   app.get('/dev/users', async () => {
     const cursor = await db.query(`FOR u IN ${USER_COLLECTION} LIMIT 20 RETURN u`);
     return { items: await cursor.all() };
+  });
+  app.get('/me', async (req, reply) => {
+    const cookies = parseCookie((req.headers as any)['cookie']);
+    const sess = getSession(cookies.sid);
+    if (!sess) { reply.code(401); return { error: 'unauthorized' }; }
+    const userDoc = await db.collection(USER_COLLECTION).document(sess.userId).catch(() => null);
+    if (!userDoc) { reply.code(401); return { error: 'unauthorized' }; }
+    return { user: { id: userDoc._key, displayName: userDoc.displayName, locale: userDoc.locale, scl: userDoc.scl, flags: userDoc.flags } };
   });
   const port = Number(process.env.AUTH_PORT || 4060);
   await app.listen({ port, host: '0.0.0.0' });
