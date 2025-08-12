@@ -1,11 +1,23 @@
 import type { SCLLevel } from './governance';
 
-export type ProofType = 'complete' | 'github_pr';
+// 'complete' kept for backward compatibility; canonical simple auto proof is 'check_in'.
+export type ProofType = 'complete' | 'check_in' | 'github_pr' | 'text_note' | 'link' | 'photo' | 'peer_confirm';
 
 export interface ProofPolicy {
   type: ProofType;
   requiredSCL?: SCLLevel;
   description: string;
+  // Future: could add schema/fields; keep minimal for now
+}
+
+export type ProofReviewStatus = 'pending' | 'approved' | 'rejected';
+
+export interface ProofSubmission {
+  questId: string;
+  submittedAt: string; // ISO timestamp
+  data?: unknown; // shape depends on policy.type
+  status: ProofReviewStatus; // pending until reviewed
+  note?: string; // optional human note
 }
 
 export interface GitHubIssueLite {

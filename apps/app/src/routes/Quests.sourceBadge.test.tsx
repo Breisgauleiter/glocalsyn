@@ -1,4 +1,5 @@
 import { render, screen } from '@testing-library/react';
+import { MemoryRouter } from 'react-router-dom';
 import { Quests } from './Quests';
 
 describe('Quests source badge', () => {
@@ -6,15 +7,15 @@ describe('Quests source badge', () => {
     localStorage.clear();
   });
 
-  it('shows Local badge for local quest', () => {
-    // default profile → only local dummy quest
-    render(<Quests />);
-    expect(screen.getByTestId('source-badge-local')).toBeInTheDocument();
+  it('shows Local badge for at least one local quest', () => {
+    render(<MemoryRouter><Quests /></MemoryRouter>);
+    const locals = screen.getAllByTestId('source-badge-local');
+    expect(locals.length).toBeGreaterThan(0);
   });
 
   it('shows GitHub badge when unlocked and mapped quest present', () => {
     localStorage.setItem('profile', JSON.stringify({ githubLinked: true, scl: 4 }));
-    render(<Quests />);
+  render(<MemoryRouter><Quests /></MemoryRouter>);
     expect(screen.getByTestId('source-badge-github')).toBeInTheDocument();
   });
 });

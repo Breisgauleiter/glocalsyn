@@ -1,6 +1,6 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { renderHook, waitFor } from '@testing-library/react';
-import { useQuestStore, getQuestsForProfile } from './questStore';
+import { useQuestStore } from './questStore';
 
 // Helper to set and restore env between tests
 const originalEnv = { ...process.env };
@@ -78,6 +78,9 @@ describe('useQuestStore with GitHub adapter flag', () => {
       await waitFor(() => {
         const joined = issues.join('\n');
         expect(joined).toContain('/repos/owner/a/issues');
+      });
+      await waitFor(() => {
+        const joined = issues.join('\n');
         expect(joined).toContain('/repos/owner/b/issues');
       });
       // And ensure env repo was not used

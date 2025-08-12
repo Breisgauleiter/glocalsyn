@@ -6,13 +6,15 @@ export interface Profile {
   region?: string;
   scl: SCLLevel;
   githubLinked: boolean;
+  xp?: number;
+  badges?: string[];
   githubRepos?: string[]; // optional per-user repo selection (overrides env if set)
   githubIssueState?: 'open' | 'closed' | 'all'; // optional per-user issue state filter
   githubLabels?: string[]; // optional per-user labels filter
   githubToken?: string; // optional personal token (stored locally only)
 }
 
-const DEFAULT_PROFILE: Profile = { scl: 1 as SCLLevel, githubLinked: false };
+const DEFAULT_PROFILE: Profile = { scl: 1 as SCLLevel, githubLinked: false, xp: 0, badges: [] };
 
 export function useProfile() {
   const [profile, setProfile] = useState<Profile>(DEFAULT_PROFILE);
@@ -43,7 +45,9 @@ export function useProfile() {
               : parsed.githubLabels,
         };
         setProfile({ ...DEFAULT_PROFILE, ...normalized });
-      } catch {}
+      } catch {
+        // Intentionally ignore JSON parse errors; fall back to DEFAULT_PROFILE
+      }
     }
   }, []);
 

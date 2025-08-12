@@ -6,10 +6,16 @@
   "private": true,
   "scripts": {
     "build": "tsc -p tsconfig.json",
-    "lint": "echo 'no lint yet'",
+  "lint": "eslint --ext .ts src",
+  "format": "prettier --write .",
     "test": "node -e \"console.log('no tests yet')\""
   },
   "devDependencies": {
+  "eslint": "^8.57.0",
+  "@typescript-eslint/eslint-plugin": "^8.3.0",
+  "@typescript-eslint/parser": "^8.3.0",
+  "eslint-config-prettier": "^9.1.0",
+  "prettier": "^3.3.3",
     "@types/node": "^20.14.9",
     "typescript": "^5.5.4"
   }
