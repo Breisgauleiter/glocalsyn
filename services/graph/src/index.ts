@@ -31,7 +31,19 @@ export async function getRecommendations(db: Database, userObjectKey: string, li
 export interface InMemoryEdge { _from: string; _to: string; type: GraphEdge['type']; }
 export function recommendInMemory(objects: GraphObject[], edges: InMemoryEdge[], userKey: string, limit = 10): GraphRecommendation[] { const fromId = `${COLLECTIONS.objects}/${userKey}`; const targets = new Set(edges.filter(e => e._from === fromId && (e.type === 'recommends' || e.type === 'follows')).map(e => e._to)); return objects.filter(o => targets.has(`${COLLECTIONS.objects}/${o._key}`)).slice(0, limit).map(node => ({ node: node as SharedGraphObject, reasons: [{ code: 'social_proof', explanation: 'in-memory edge' }] })); }
 
-export function buildMapSnapshot(objects: GraphObject[], edges: InMemoryEdge[], limit = 200) { return { nodes: objects.slice(0, limit), edges: edges.slice(0, limit * 2), meta: { generatedAt: Date.now(), nodeCount: objects.length, edgeCount: edges.length } }; }
+function enrichObject<T extends Partial<GraphObject>>(o: T): T & Pick<GraphObject, 'diversityTags' | 'bridgeScore' | 'activityScore'> {
+  return {
+    diversityTags: Array.isArray((o as any).diversityTags) ? (o as any).diversityTags : [],
+    bridgeScore: typeof (o as any).bridgeScore === 'number' ? (o as any).bridgeScore : 0,
+    activityScore: typeof (o as any).activityScore === 'number' ? (o as any).activityScore : 0,
+    ...o
+  } as any;
+}
+
+export function buildMapSnapshot(objects: GraphObject[], edges: InMemoryEdge[], limit = 200) {
+  const sliced = objects.slice(0, limit).map(enrichObject);
+  return { nodes: sliced, edges: edges.slice(0, limit * 2), meta: { generatedAt: Date.now(), nodeCount: objects.length, edgeCount: edges.length } };
+}
 
 export async function bootstrap() { const cfg = loadConfig(); const sys = new Database({ url: cfg.url }); if (cfg.username && cfg.password) sys.useBasicAuth(cfg.username, cfg.password); try { await ensureDatabase(sys, cfg.database); const db = new Database({ url: cfg.url, databaseName: cfg.database }); if (cfg.username && cfg.password) db.useBasicAuth(cfg.username, cfg.password); await ensureCollections(db); const count = await db.collection(COLLECTIONS.objects).count(); if (count.count === 0) { const u = await upsertObject(db, { type: 'user', name: 'Demo User' }); const h = await upsertObject(db, { type: 'hub', name: 'Demo Hub' }); await createEdge(db, { _from: `${COLLECTIONS.objects}/${u}`, _to: `${COLLECTIONS.objects}/${h}`, type: 'joins', createdAt: Date.now() }); } const app = Fastify({ logger: false }); app.get('/health', async () => ({ ok: true })); app.get('/graph/recommendations/:userKey', async (req, reply) => { const { userKey } = req.params as any; try { return { items: await getRecommendations(db, userKey, 10) }; } catch (e) { reply.code(500); return { error: (e as Error).message }; } }); app.get('/graph/map-snapshot', async () => { const nodes: GraphObject[] = await (await db.query(aql`FOR o IN ${db.collection(COLLECTIONS.objects)} LIMIT 200 RETURN o`)).all(); const edges = await (await db.query(aql`FOR e IN ${db.collection(COLLECTIONS.edges)} LIMIT 400 RETURN e`)).all(); return { nodes, edges, meta: { generatedAt: Date.now(), nodeCount: nodes.length, edgeCount: edges.length } }; }); const port = Number(process.env.GRAPH_PORT || 4050); await app.listen({ port, host: '0.0.0.0' }); console.log(`[graph] HTTP API listening on :${port}`); } catch (err) { console.warn('[graph] Bootstrap skipped:', (err as Error).message); } }
 
