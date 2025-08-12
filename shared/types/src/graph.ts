@@ -3,17 +3,18 @@
 
 export type GraphObjectType = 'user' | 'hub' | 'quest';
 
+export interface GraphObject {
+  _key: string; // ArangoDB document key
+  type: GraphObjectType;
+  name: string;
+  // Additional fields per type
+  [key: string]: any;
+}
+
 export interface GraphNodeMeta {
   diversityTags?: string[];
   bridgeScore?: number;
   activityScore?: number;
-  [key: string]: any;
-}
-
-export interface GraphObject extends GraphNodeMeta {
-  _key: string;
-  type: GraphObjectType;
-  name: string;
   [key: string]: any;
 }
 
@@ -39,8 +40,8 @@ export type RecommendationReasonCode = 'bridge' | 'diversity' | 'continuation' |
 export interface RecommendationReason { code: RecommendationReasonCode; weight?: number; explanation?: string; meta?: Record<string, any>; }
 export interface GraphRecommendation { node: GraphObject; reasons: RecommendationReason[]; }
 
-export function createGraphObject(type: GraphObjectType, key: string, name: string, meta: Partial<GraphObject> = {}): GraphObject {
-  return { _key: key, type, name, diversityTags: meta.diversityTags ?? [], bridgeScore: meta.bridgeScore ?? 0, activityScore: meta.activityScore ?? 0, ...meta };
+export function createGraphObject(type: GraphObjectType, key: string, name: string, meta: Partial<GraphObject & GraphNodeMeta> = {}): GraphObject & GraphNodeMeta {
+  return { _key: key, type, name, diversityTags: (meta as any).diversityTags ?? [], bridgeScore: (meta as any).bridgeScore ?? 0, activityScore: (meta as any).activityScore ?? 0, ...meta } as any;
 }
 
 export function isGraphEdge(value: any): value is GraphEdge {

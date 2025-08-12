@@ -10,21 +10,21 @@
     "build": "tsc -p tsconfig.json",
     "dev": "node --watch src/index.ts",
     "start": "node dist/index.js",
-  "lint": "eslint --ext .ts src",
-  "format": "prettier --write .",
-  "test": "pnpm build && node --test dist" 
+    "lint": "eslint --ext .ts src",
+    "format": "prettier --write .",
+    "test": "pnpm build && node --test dist"
   },
   "dependencies": {
-  "arangojs": "^9.0.0",
-  "fastify": "^4.28.1",
-  "@syntopia/types": "workspace:*"
+    "arangojs": "^9.0.0",
+    "fastify": "^4.28.1",
+    "@syntopia/types": "workspace:*"
   },
   "devDependencies": {
-  "eslint": "^8.57.0",
-  "@typescript-eslint/eslint-plugin": "^8.3.0",
-  "@typescript-eslint/parser": "^8.3.0",
-  "eslint-config-prettier": "^9.1.0",
-  "prettier": "^3.3.3",
+    "eslint": "^8.57.0",
+    "@typescript-eslint/eslint-plugin": "^8.3.0",
+    "@typescript-eslint/parser": "^8.3.0",
+    "eslint-config-prettier": "^9.1.0",
+    "prettier": "^3.3.3",
     "typescript": "^5.5.0",
     "@types/node": "^20.11.0"
   }

@@ -60,8 +60,8 @@ export function Me() {
       <dt className="muted">{t('me.account.github')}</dt>
             <dd aria-live="polite">{profile.githubLinked ? 'Verknüpft' : 'Nicht verknüpft'}</dd>
           </div>
-      <div>
-    <dt className="muted">{t('me.account.badges')}</dt>
+          <div>
+            <dt className="muted">{t('me.account.badges')}</dt>
             <dd aria-live="polite" data-testid="badge-list">{(profile.badges && profile.badges.length > 0) ? profile.badges.join(', ') : '—'}</dd>
           </div>
         </dl>

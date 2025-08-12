@@ -58,7 +58,6 @@ To enable read-only GitHub issues as a quest source (for users with SCL ≥ 4 an
 Notes:
 - Adapter is read-only and best-effort. On errors it falls back to the baseline mock.
 - The dummy onboarding quest remains; when enabled, GitHub quests are added on top.
- 
 
 ## Per-user GitHub settings (optional)
 

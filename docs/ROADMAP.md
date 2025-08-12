@@ -46,47 +46,26 @@
 	- Aufstiegs‑Proof zu SCL 4: erfolgreiche Verknüpfung des Syntopia‑Accounts mit dem GitHub‑Account
 	- Proof‑Regeln (SCL ≥ 4): Nachweis = erfolgreich gereviewter PR, der das zugehörige Issue schließt (automatisch synchronisiert)
 	- Issue→Quest Pipeline: Issues aus den Repos „Syntopia“ (später auch „GLOCALSPIRIT“) füllen die Quests; Quelle (Repo/Issue) und Status werden angezeigt
- - 3D Graph Map POC (react-force-graph-3d oder Alternative) – Visualisierung der Knoten: User, Quests, Hubs (progressive enhancement, Low‑Spec Fallback 2D / vereinfachte Liste)
- - Basis-Konzept „Graph-First UI" dokumentiert (Richtlinien für ersetzbare Listen → interaktive Netzwerke)
 
 
 #### Fortschritt (12.08.2025)
 - Account‑Link Flow (Opt‑in) [DELIVERED]
- - Read‑only GitHub Issues Adapter [DELIVERED] (Feature‑Flag: VITE_USE_GITHUB_ADAPTER, default off)
- - Repo‑Auswahl UI (mehrere Repos, Persistenz im Profil) [DELIVERED]
- - UI Quests: Source‑Badges, persistente Filter, leere Zustände mit CTA [DELIVERED]; Proof‑Typen Check‑in, Text, Link, Foto, Peer konsolidiert
- - Review‑Queue: Proof‑Typ Badges, Filter, Foto‑Vorschau, Peer‑Notiz [DELIVERED]
- - Proof‑Semantik: XP & Badge Progression erweitert (Legacy 'done' Normalisierung, Reviewer / Threshold Badges) [DELIVERED]
- - Test-Infrastruktur gehärtet: speicherstabiles per‑File Runner, konsolidierte QuestDetail Flows, Coverage (v8) sequentiell, neue questStore Tests (Approve/Reject, XP/SCL, Badges) [DELIVERED]
- - Doku aktualisiert (GETTING_STARTED, TESTING) mit Env‑Flags & Coverage Nutzung [DELIVERED]
- - Graph-First UI Initiative: Evaluierung 3D-Force-Libs (react-force-graph-3d, drei.js basierte Optionen) [PLANNED]
- - Accessibility & Performance Leitplanken für 3D: Fallback-Strategie skizziert (SSR-Liste / 2D Force) [PLANNED]
-
-Nächste Schritte (kleine PRs):
- - TAO-Graph-Modell Verfeinerung: shared/types Erweiterung (Brücken-Attribute, Diversity Tags) + Service Endpoints
- - "Heute dran..." Empfehlungen Placeholder (Home) mit erklärbarem Mock-Reason (Brückenquest, Vielfalt, Fortsetzung)
- - Pagination & Limit + defensive Rate-Limit-Handhabung im GitHub Adapter
- - Semantik: Vorbereitung PR→Issue Close Mapping (Proof Voraussetzung ab SCL ≥ 4, noch read‑only)
- - I18n: DE/EN für neue Graph/Empfehlungs-UI Strings
- - OAuth2 Spezifikation konkretisieren (Start/Callback Endpoints, State, Token Persist Layer) → Übergang Sprint 04
- - Sync Pipeline v1 Draft: Polling Contract (ETag, If-None-Match) + Delta Merge Strategie
- - Optional: Memory Profiling Ticket (Rückweg zu parallelem Vitest falls machbar)
- - 3D Graph Map POC implementieren (Feature-Flag `VITE_ENABLE_GRAPH_3D` + Fallback Rendering testen)
- - Graph-UI Guidelines Markdown anlegen (Interaktionsprinzipien, Node-Typ Farben, Fokus-/Kontext-Modus)
- - Messpunkte definieren: FPS (≥ 50 Ziel mobil), Initial Payload Budget, Node Count Threshold für Auto-Downgrade
-
-#### Fortschritt (11.08.2025)
-- Account‑Link Flow (Opt‑in) [DELIVERED]
 - Read‑only GitHub Issues Adapter [DELIVERED] und hinter Feature‑Flag verdrahtet (default: off)
-- UI für Quests: Source‑Badges, Filter (persistiert), leere Zustände mit CTA [DELIVERED]
+- UI für Quests: Source‑Badges, Filter (persistiert), leere Zustände mit CTA [DELIVERED]; neue Proof‑Typen in Detail‑UI (Check‑in, Text, Link, Foto, Peer)
+- Review‑Queue: Proof‑Typ Badges, Filter, Foto‑Vorschau, Peer‑Notiz [DELIVERED]
 - Tests: Unit + E2E grün; CI‑Workflow grün [DELIVERED]
 - Doku: GETTING_STARTED mit Env‑Flags (VITE_USE_GITHUB_ADAPTER, VITE_GITHUB_REPOS, optional TOKEN, LIMIT) [DELIVERED]
 
 Nächste Schritte (kleine PRs):
+- TAO-Graph-Modell in shared/types und Backend: ArangoDB Collections für Objects (user, hub, quest) und Associations (follows, joins, recommends)
 - Repo‑Auswahl‑UI (mehrere Repos, Opt‑in je Repo)
 - Pagination/Limit für Adapter, defensive Rate‑Limit‑Handhabung
 - Semantik: PR→Issue‑Close‑Erzwingung für Proofs ab SCL ≥ 4 (read‑only bleibt vorerst bestehen)
 - I18n: DE/EN Texte für neue UI‑Elemente
+ - GitHub OAuth2 Implementierung (Sprint 03→04 Übergang): Backend Redirect & Callback, Token-Exchange, Verschlüsselung at rest, Logout/Token Revoke
+ - Repo-Auswahl nach OAuth: Abruf user/org Repos via API (paginierend) + Opt‑in pro Repo, Speicherung minimaler Metadaten
+ - Sync Pipeline v1: Periodisches Polling (ETag) für Issues der verknüpften Repos → Quest-Refresh (Delta-basiert)
+ - Webhook-Vorbereitung (optional): Konfigurationsentwurf für spätere Echtzeit-Sync (Issue events, Pull Request events)
 
 ## Phase 2: Community Features (Sprints 4-6)
 
@@ -137,7 +116,6 @@ Nächste Schritte (kleine PRs):
  - Pipeline: Syntopia‑ und GLOCALSPIRIT‑Issues → Syntopia‑Quests; das Erledigen via PR‑Merge/Issue‑Close lässt beide Repos und das Quest‑Angebot wachsen.
  - Proof‑Zusammenfassung: SCL 1–3 = Questabschluss (Client‑Proof); ab SCL 4 = verknüpfter GitHub‑Account + gereviewter PR, der das Issue schließt.
 
-<<<<<<< HEAD
 ### GitHub OAuth & Sync Roadmap (Detail)
 1. OAuth2 Einführung (Sprint 03): Backend Endpoints + state-Verifizierung + minimaler Token-Store (Access Token, optional Refresh falls Fine-Grained Tokens genutzt)
 2. Repo-Auswahl UI (Ende Sprint 03): Liste der Repos (nur notwendige Felder), persistierte Auswahl pro User
