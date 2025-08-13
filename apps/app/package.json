@@ -7,15 +7,15 @@
     "dev": "vite",
     "build": "vite build",
     "preview": "vite preview --port 5173",
-  "test:fast:single": "VITEST_MAX_THREADS=1 VITEST_MIN_THREADS=1 vitest run --reporter=basic --exclude=src/routes/QuestDetail.flows.test.tsx --exclude=src/routes/ReviewQueue.enhanced.test.tsx --exclude=src/routes/Badges.test.tsx",
-  "test:coverage:seq": "node scripts/run-test-per-file.mjs coverage",
-  "test:coverage": "pnpm test:coverage:seq",
-  "test:fast": "node scripts/run-test-per-file.mjs fast",
-  "test:integration": "node scripts/run-test-per-file.mjs integration",
-  "test:all": "pnpm test:fast && pnpm test:integration",
-  "test": "pnpm test:all",
-  "lint": "eslint --ext .ts,.tsx src",
-  "format": "prettier --write .",
+    "test:fast:single": "VITEST_MAX_THREADS=1 VITEST_MIN_THREADS=1 vitest run --reporter=basic --exclude=src/routes/QuestDetail.flows.test.tsx --exclude=src/routes/ReviewQueue.enhanced.test.tsx --exclude=src/routes/Badges.test.tsx",
+    "test:coverage:seq": "node scripts/run-test-per-file.mjs coverage",
+    "test:coverage": "pnpm test:coverage:seq",
+    "test:fast": "node scripts/run-test-per-file.mjs fast",
+    "test:integration": "node scripts/run-test-per-file.mjs integration",
+    "test:all": "pnpm test:fast && pnpm test:integration",
+    "test": "pnpm test:all",
+    "lint": "eslint --ext .ts,.tsx src",
+    "format": "prettier --write .",
     "e2e": "playwright test",
     "e2e:install": "playwright install --with-deps"
   },
@@ -23,9 +23,9 @@
     "@syntopia/types": "workspace:*",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
-  "react-router-dom": "^6.26.1",
-  "react-force-graph-3d": "^1.24.4",
-  "three": "^0.165.0"
+    "react-router-dom": "^6.26.1",
+    "react-force-graph-3d": "^1.24.4",
+    "three": "^0.165.0"
   },
   "devDependencies": {
     "@playwright/test": "^1.46.1",
@@ -49,7 +49,7 @@
     "prettier": "^3.3.3",
     "typescript": "^5.5.4",
     "vite": "^5.4.1",
-  "vitest": "^2.0.5",
-  "@types/three": "^0.165.0"
+    "vitest": "^2.0.5",
+    "@types/three": "^0.165.0"
   }
 }

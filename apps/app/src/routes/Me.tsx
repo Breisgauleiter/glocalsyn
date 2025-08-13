@@ -44,7 +44,6 @@ export function Me() {
     update({ githubRepos: arr });
     setReposInput(arr.join(', '));
   }
-
   return (
     <section aria-labelledby="me-title" className="container stack" style={{ padding: 16 }}>
       <h1 id="me-title">{t('me.title')}</h1>
@@ -61,8 +60,8 @@ export function Me() {
       <dt className="muted">{t('me.account.github')}</dt>
             <dd aria-live="polite">{profile.githubLinked ? 'Verknüpft' : 'Nicht verknüpft'}</dd>
           </div>
-      <div>
-    <dt className="muted">{t('me.account.badges')}</dt>
+          <div>
+            <dt className="muted">{t('me.account.badges')}</dt>
             <dd aria-live="polite" data-testid="badge-list">{(profile.badges && profile.badges.length > 0) ? profile.badges.join(', ') : '—'}</dd>
           </div>
         </dl>

@@ -15,17 +15,17 @@
   "graph:test": "pnpm --filter @syntopia/graph-service test"
   },
   "devDependencies": {
-  "turbo": "^2.0.6",
-  "eslint": "^8.57.0",
-  "@typescript-eslint/eslint-plugin": "^8.3.0",
-  "@typescript-eslint/parser": "^8.3.0",
-  "eslint-config-prettier": "^9.1.0",
-  "prettier": "^3.3.3",
-  "eslint-plugin-react": "^7.35.0",
-  "eslint-plugin-react-hooks": "^4.6.2",
-  "eslint-plugin-jsx-a11y": "^6.9.0",
-  "eslint-plugin-testing-library": "^6.2.2",
-  "eslint-plugin-jest-dom": "^5.4.0",
-  "eslint-plugin-n": "^17.10.2"
+    "turbo": "^2.0.6",
+    "eslint": "^8.57.0",
+    "@typescript-eslint/eslint-plugin": "^8.3.0",
+    "@typescript-eslint/parser": "^8.3.0",
+    "eslint-config-prettier": "^9.1.0",
+    "prettier": "^3.3.3",
+    "eslint-plugin-react": "^7.35.0",
+    "eslint-plugin-react-hooks": "^4.6.2",
+    "eslint-plugin-jsx-a11y": "^6.9.0",
+    "eslint-plugin-testing-library": "^6.2.2",
+    "eslint-plugin-jest-dom": "^5.4.0",
+    "eslint-plugin-n": "^17.10.2"
   }
 }

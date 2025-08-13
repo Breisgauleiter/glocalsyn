@@ -47,30 +47,30 @@
 	- Proof‑Regeln (SCL ≥ 4): Nachweis = erfolgreich gereviewter PR, der das zugehörige Issue schließt (automatisch synchronisiert)
 	- Issue→Quest Pipeline: Issues aus den Repos „Syntopia“ (später auch „GLOCALSPIRIT“) füllen die Quests; Quelle (Repo/Issue) und Status werden angezeigt
  - 3D Graph Map POC (react-force-graph-3d oder Alternative) – Visualisierung der Knoten: User, Quests, Hubs (progressive enhancement, Low‑Spec Fallback 2D / vereinfachte Liste)
- - Basis-Konzept „Graph-First UI" dokumentiert (Richtlinien für ersetzbare Listen → interaktive Netzwerke)
+ - Basis-Konzept „Graph-First UI“ dokumentiert (Richtlinien für ersetzbare Listen → interaktive Netzwerke)
 
 
 #### Fortschritt (12.08.2025)
 - Account‑Link Flow (Opt‑in) [DELIVERED]
- - Read‑only GitHub Issues Adapter [DELIVERED] (Feature‑Flag: VITE_USE_GITHUB_ADAPTER, default off)
- - Repo‑Auswahl UI (mehrere Repos, Persistenz im Profil) [DELIVERED]
- - UI Quests: Source‑Badges, persistente Filter, leere Zustände mit CTA [DELIVERED]; Proof‑Typen Check‑in, Text, Link, Foto, Peer konsolidiert
- - Review‑Queue: Proof‑Typ Badges, Filter, Foto‑Vorschau, Peer‑Notiz [DELIVERED]
- - Proof‑Semantik: XP & Badge Progression erweitert (Legacy 'done' Normalisierung, Reviewer / Threshold Badges) [DELIVERED]
- - Test-Infrastruktur gehärtet: speicherstabiles per‑File Runner, konsolidierte QuestDetail Flows, Coverage (v8) sequentiell, neue questStore Tests (Approve/Reject, XP/SCL, Badges) [DELIVERED]
- - Doku aktualisiert (GETTING_STARTED, TESTING) mit Env‑Flags & Coverage Nutzung [DELIVERED]
+- Read‑only GitHub Issues Adapter [DELIVERED] (Feature‑Flag: VITE_USE_GITHUB_ADAPTER, default off)
+- Repo‑Auswahl UI (mehrere Repos, Persistenz im Profil) [DELIVERED]
+- UI Quests: Source‑Badges, persistente Filter, leere Zustände mit CTA [DELIVERED]; Proof‑Typen Check‑in, Text, Link, Foto, Peer konsolidiert
+- Review‑Queue: Proof‑Typ Badges, Filter, Foto‑Vorschau, Peer‑Notiz [DELIVERED]
+- Proof‑Semantik: XP & Badge Progression erweitert (Legacy 'done' Normalisierung, Reviewer / Threshold Badges) [DELIVERED]
+- Test-Infrastruktur gehärtet: speicherstabiles per‑File Runner, konsolidierte QuestDetail Flows, Coverage (v8) sequentiell, neue questStore Tests (Approve/Reject, XP/SCL, Badges) [DELIVERED]
+- Doku aktualisiert (GETTING_STARTED, TESTING) mit Env‑Flags & Coverage Nutzung [DELIVERED]
  - Graph-First UI Initiative: Evaluierung 3D-Force-Libs (react-force-graph-3d, drei.js basierte Optionen) [PLANNED]
  - Accessibility & Performance Leitplanken für 3D: Fallback-Strategie skizziert (SSR-Liste / 2D Force) [PLANNED]
 
 Nächste Schritte (kleine PRs):
- - TAO-Graph-Modell Verfeinerung: shared/types Erweiterung (Brücken-Attribute, Diversity Tags) + Service Endpoints
- - "Heute dran..." Empfehlungen Placeholder (Home) mit erklärbarem Mock-Reason (Brückenquest, Vielfalt, Fortsetzung)
- - Pagination & Limit + defensive Rate-Limit-Handhabung im GitHub Adapter
- - Semantik: Vorbereitung PR→Issue Close Mapping (Proof Voraussetzung ab SCL ≥ 4, noch read‑only)
- - I18n: DE/EN für neue Graph/Empfehlungs-UI Strings
- - OAuth2 Spezifikation konkretisieren (Start/Callback Endpoints, State, Token Persist Layer) → Übergang Sprint 04
- - Sync Pipeline v1 Draft: Polling Contract (ETag, If-None-Match) + Delta Merge Strategie
- - Optional: Memory Profiling Ticket (Rückweg zu parallelem Vitest falls machbar)
+- TAO-Graph-Modell Verfeinerung: shared/types Erweiterung (Brücken-Attribute, Diversity Tags) + Service Endpoints
+- "Heute dran..." Empfehlungen Placeholder (Home) mit erklärbarem Mock-Reason (Brückenquest, Vielfalt, Fortsetzung)
+- Pagination & Limit + defensive Rate-Limit-Handhabung im GitHub Adapter
+- Semantik: Vorbereitung PR→Issue Close Mapping (Proof Voraussetzung ab SCL ≥ 4, noch read‑only)
+- I18n: DE/EN für neue Graph/Empfehlungs-UI Strings
+- OAuth2 Spezifikation konkretisieren (Start/Callback Endpoints, State, Token Persist Layer) → Übergang Sprint 04
+- Sync Pipeline v1 Draft: Polling Contract (ETag, If-None-Match) + Delta Merge Strategie
+- Optional: Memory Profiling Ticket (Rückweg zu parallelem Vitest falls machbar)
  - 3D Graph Map POC implementieren (Feature-Flag `VITE_ENABLE_GRAPH_3D` + Fallback Rendering testen)
  - Graph-UI Guidelines Markdown anlegen (Interaktionsprinzipien, Node-Typ Farben, Fokus-/Kontext-Modus)
  - Messpunkte definieren: FPS (≥ 50 Ziel mobil), Initial Payload Budget, Node Count Threshold für Auto-Downgrade
@@ -154,7 +154,7 @@ Ziel: Wo immer Beziehungen Mehrwert stiften (Kontakte, Gruppen, Quests, Hubs, Re
 
 ### Technologiekandidat
 Primär: react-force-graph-3d (Three.js basierend) – Gründe: Stabil etablierte API, Force-Engine konfigurierbar, VR/AR Erweiterbarkeit. Alternativen im Evaluations-Doc: sigma.js (2D), d3-force + custom Three Layer (höherer Wartungsaufwand), vivagraph.
-
+>>>>>>> 283933c (feat(graph-3d): Step 4 POC + tests)
 ### Tasks (laufend)
 - Library Evaluation Report (FPS Benchmarks, Memory Profiling)
 - Fallback Strategy Component (GraphFallbackList)
@@ -172,7 +172,6 @@ Primär: react-force-graph-3d (Three.js basierend) – Gründe: Stabil etabliert
 - ≥ 95% der unterstützten Geräte liefern > 45 FPS bei 200 Knoten / 400 Kanten
 - Nutzer verstehen (Umfrage) "Warum sehe ich diese Empfehlung" (>80% Zustimmung)
 - Kein Anstieg von Abbruchraten in den Flows (Quest-Annahme) nach Graph-Einführung
-
 ## Meilensteine
 - **M1** (Ende Sprint 3): MVP lauffähig, erste 100 Beta-Tester
 - **M2** (Ende Sprint 6): Community-Features aktiv, 1000 aktive Nutzer, Governance V1 aktiv
