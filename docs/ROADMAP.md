@@ -65,6 +65,11 @@
 #### Update (14.08.2025)
 - Auth: Magic‑Link Dev‑Token E2E hinzugefügt (Login → Token → Wizard → Quests) [DELIVERED]
 - Cleanup: Duplikat `authStore.tsx` entfernt (nur `authStore.ts` bleibt) [DELIVERED]
+- Local Dev DB: Konsolidierung auf eine ArangoDB Instanz (http://localhost:8530) für alle Services; zweite DB entfernt, Scripts bereinigt. [DONE]
+- Graph-Service: Fastify-Service auf :4050 mit `GET /graph/map-snapshot` und `GET /graph/recommendations/:userKey` inkl. ETag live; App konsumiert über `VITE_GRAPH_URL` (Tasks hinzugefügt). [DELIVERED]
+- Shared Utils: `@syntopia/utils` (ETag-Helper) als Workspace-Package mit Typen exportiert. [DONE]
+- Dev-Tasks: VS Code Tasks für DB/Graph/Auth/App ergänzt; App-Task startet nur eine Vite-Instanz und injiziert `VITE_GRAPH_URL` + `VITE_ENABLE_GRAPH_3D`. [DONE]
+- Auth-Wiring: Vite-Proxy für `/auth` & `/me` standardisiert auf :4160; Auth-Service (Magic-Link, Sessions, Rate-Limits, Dev-Console-Mail) lauffähig. [DELIVERED]
 
 Sprint 03 Restarbeiten (kleine PRs – Fokus auf Graph & Empfehlungen):
 1. TAO-Graph-Modell Verfeinerung: shared/types Erweiterung (bridgeScore, diversityTags, activityScore Defaults) + Service Endpoints (Map Snapshot angereichert) [DONE]
@@ -76,7 +81,7 @@ Sprint 03 Restarbeiten (kleine PRs – Fokus auf Graph & Empfehlungen):
 7. Sync Pipeline v1 Draft: Polling Contract (ETag, If-None-Match) + Delta Merge Strategie + util Stub [DONE]
 8. Optional: Memory Profiling Ticket (Pfad zurück zu parallelem Vitest falls stabil) [OPEN]
 	- Draft ticket created (docs/MEMORY_PROFILING_TICKET.md) [DONE]
-9. 3D Graph Map POC implementieren (Feature-Flag `VITE_ENABLE_GRAPH_3D` + Fallback Rendering testen) [PARTIAL – Downgrade + Fallback + FPS Test]
+9. 3D Graph Map POC implementieren (Feature-Flag `VITE_ENABLE_GRAPH_3D` + Fallback Rendering testen) [DONE – POC + Downgrade/Threshold-Tests, Flag injiziert]
 10. Graph-UI Guidelines Markdown anlegen (Interaktionsprinzipien, Node-Typ Farben, Fokus-/Kontext-Modus) [DONE]
 11. Messpunkte definieren: FPS (≥ 50 Ziel mobil), Initial Payload Budget, Node Count Threshold für Auto-Downgrade [PARTIAL – Sampler + Downgrade Test]
 12. Telemetry Dispatcher (buffer + periodic flush) [DONE]

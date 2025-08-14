@@ -202,6 +202,12 @@ importers:
 
   shared/utils:
     devDependencies:
+      '@types/node':
+        specifier: ^20.11.0
+        version: 20.19.10
+      typescript:
+        specifier: ^5.5.4
+        version: 5.9.2
       vitest:
         specifier: 2.1.9
         version: 2.1.9(@types/node@20.19.10)(jsdom@25.0.1)

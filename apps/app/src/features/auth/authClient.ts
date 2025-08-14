@@ -46,3 +46,33 @@ export async function getMe(): Promise<AuthUser | null> {
 export async function logout(): Promise<void> {
   await fetch('/auth/logout', { method: 'POST', credentials: 'include' }).catch(() => {});
 }
+
+export async function registerCredentials(username: string, email: string, password: string): Promise<AuthUser> {
+  const res = await fetch('/auth/register', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ username, email, password }),
+    credentials: 'include',
+  });
+  if (!res.ok) {
+    const data = await res.json().catch(() => ({}));
+    throw new Error((data as any)?.error || `HTTP ${res.status}`);
+  }
+  const data = await res.json();
+  return (data as any).user as AuthUser;
+}
+
+export async function loginCredentials(id: string, password: string): Promise<AuthUser> {
+  const res = await fetch('/auth/login', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ id, password }),
+    credentials: 'include',
+  });
+  if (!res.ok) {
+    const data = await res.json().catch(() => ({}));
+    throw new Error((data as any)?.error || `HTTP ${res.status}`);
+  }
+  const data = await res.json();
+  return (data as any).user as AuthUser;
+}

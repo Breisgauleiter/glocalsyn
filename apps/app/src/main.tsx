@@ -10,6 +10,7 @@ import { QuestDetail } from './routes/QuestDetail';
 import { Hubs } from './routes/Hubs';
 import { Me } from './routes/Me';
 import { Login } from './features/auth/Login';
+import { Register } from './features/auth/Register';
 import { ProfileWizard } from './features/profile/ProfileWizard';
 import './styles/global.css';
 import { configureFlush, getBuffer, clearBuffer } from './utils/telemetry';
@@ -22,7 +23,8 @@ const router = createBrowserRouter([
     element: <App />,
     children: [
       { index: true, element: <Home /> },
-      { path: 'login', element: <Login /> },
+  { path: 'login', element: <Login /> },
+  { path: 'register', element: <Register /> },
       { path: 'profile-setup', element: <ProfileWizard /> },
       { path: 'quests', element: <Quests /> },
   { path: 'quests/:id', element: <QuestDetail /> },

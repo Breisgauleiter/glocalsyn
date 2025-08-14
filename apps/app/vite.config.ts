@@ -16,11 +16,12 @@ export default defineConfig({
     proxy: {
       // Auth endpoints proxied to auth service to keep cookies same-origin in dev
       '/auth': {
-        target: 'http://localhost:4060',
+        // Use different default port to avoid conflicts; override via VITE_AUTH_PORT or VITE_AUTH_TARGET
+        target: process.env.VITE_AUTH_TARGET || `http://localhost:${process.env.VITE_AUTH_PORT || 4160}`,
         changeOrigin: true,
       },
       '/me': {
-        target: 'http://localhost:4060',
+        target: process.env.VITE_AUTH_TARGET || `http://localhost:${process.env.VITE_AUTH_PORT || 4160}`,
         changeOrigin: true,
       },
     },

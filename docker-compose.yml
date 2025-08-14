@@ -1,0 +1,16 @@
+services:
+  db:
+    image: arangodb:3.11
+    environment:
+      - ARANGO_NO_AUTH=1
+    ports:
+      - "8530:8529"
+    volumes:
+      - arango_data:/var/lib/arangodb3
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8529/_api/version"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+volumes:
+  arango_data:

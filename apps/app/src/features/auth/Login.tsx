@@ -1,6 +1,6 @@
 import { FormEvent, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { requestMagicLink, consumeMagicLink, getMe } from './authClient';
+import { requestMagicLink, consumeMagicLink, getMe, loginCredentials } from './authClient';
 
 export function Login() {
   const nav = useNavigate();
@@ -8,6 +8,8 @@ export function Login() {
   const [status, setStatus] = useState<'idle'|'sent'|'verifying'|'error'>('idle');
   const [error, setError] = useState<string|undefined>();
   const [devToken, setDevToken] = useState<string>('');
+  const [id, setId] = useState('');
+  const [password, setPassword] = useState('');
 
   useEffect(() => {
     // Restore session if present
@@ -35,9 +37,27 @@ export function Login() {
     }
   }
 
+  async function onLoginCredentials(e: FormEvent) {
+    e.preventDefault(); setError(undefined);
+    try {
+      await loginCredentials(id, password);
+      nav('/');
+    } catch (err: any) {
+      setStatus('error'); setError(err?.message || 'Fehler');
+    }
+  }
+
   return (
     <section className="container stack glass-card" aria-labelledby="login-title">
       <h1 id="login-title" className="h1">Login</h1>
+      <form onSubmit={onLoginCredentials} role="form" className="stack">
+        <label htmlFor="id">E‑Mail oder Nutzername</label>
+        <input id="id" name="id" className="input" value={id} onChange={(e)=>setId(e.currentTarget.value)} required />
+        <label htmlFor="password">Passwort</label>
+        <input id="password" name="password" type="password" className="input" value={password} onChange={(e)=>setPassword(e.currentTarget.value)} required />
+        <button type="submit" className="btn btn-primary" disabled={!id||!password}>Anmelden</button>
+      </form>
+      <hr aria-hidden="true" />
       <form onSubmit={onSubmit} role="form" className="stack">
         <label htmlFor="email">E-Mail</label>
         <input id="email" name="email" type="email" className="input" value={email} onChange={(e)=>setEmail(e.currentTarget.value)} required />

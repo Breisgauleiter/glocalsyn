@@ -13,7 +13,10 @@
   "test:ci": "pnpm --filter @syntopia/app test:fast && pnpm --filter @syntopia/app test:integration && pnpm --filter @syntopia/app e2e",
   "graph:dev": "pnpm --filter @syntopia/graph-service dev",
   "graph:test": "pnpm --filter @syntopia/graph-service test",
-  "pr:suggest": "node tools/pr-suggest-issues.mjs"
+  "pr:suggest": "node tools/pr-suggest-issues.mjs",
+  "db:up": "docker compose up -d db",
+  "db:down": "docker compose down",
+  "auth:dev": "ARANGO_URL=http://localhost:8530 ARANGO_DB=syntopia AUTH_PORT=4160 AUTH_TEST_ALLOW_TOKEN_LEAK=1 AUTH_EMAIL_MODE=console node services/auth/dist/index.js"
   },
   "devDependencies": {
     "turbo": "^2.0.6",

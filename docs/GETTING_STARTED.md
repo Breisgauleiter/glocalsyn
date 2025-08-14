@@ -5,6 +5,7 @@ This repository is a pnpm + Turborepo monorepo. The app is a React + Vite projec
 ## Prerequisites
 - Node.js 18+
 - pnpm 9+
+- Docker (for local ArangoDB)
 
 ## Install dependencies
 At the repo root:
@@ -19,6 +20,30 @@ pnpm --filter @syntopia/app dev
 ```
 
 App runs at http://localhost:5173.
+
+Auth proxy (dev): The app proxies /auth and /me to an auth service. Default target is http://localhost:4160.
+You can override via env:
+- VITE_AUTH_PORT=4170
+- VITE_AUTH_TARGET=http://localhost:9999
+This helps avoid port conflicts with other local services.
+
+## Start local backend (Auth + DB)
+To avoid proxy errors for /auth and /me in dev and E2E, run the local DB and Auth service:
+
+1) Start ArangoDB via Docker Compose (no auth, local only) on port 8530:
+```sh
+pnpm db:up
+```
+
+2) Start the Auth service (Fastify on :4060):
+```sh
+pnpm auth:dev
+```
+
+Notes:
+- ArangoDB listens on http://localhost:8530 (container 8529).
+- Auth and Graph services will create the `syntopia` database on first run and ensure collections.
+- In dev mode, it logs magic-link emails to the console and, when `AUTH_TEST_ALLOW_TOKEN_LEAK=1`, returns the token in /auth/register responses for tests.
 
 ## Run E2E tests (Playwright)
 First time only (downloads browsers):

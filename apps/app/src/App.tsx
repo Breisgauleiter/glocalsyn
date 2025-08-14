@@ -19,7 +19,10 @@ export function App() {
                 <li><button className="btn btn-sm" onClick={() => logout()}>Logout</button></li>
               </>
             ) : (
-              <li><NavLink to="/login" className={({ isActive }) => isActive ? 'active' : undefined}>Login</NavLink></li>
+              <>
+                <li><NavLink to="/login" className={({ isActive }) => isActive ? 'active' : undefined}>Login</NavLink></li>
+                <li><NavLink to="/register" className={({ isActive }) => isActive ? 'active' : undefined}>Register</NavLink></li>
+              </>
             )}
           </ul>
         </nav>
