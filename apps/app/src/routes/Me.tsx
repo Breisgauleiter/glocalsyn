@@ -1,6 +1,7 @@
 import { useMemo, useState } from 'react';
 import { useProfile } from '../features/profile/profileStore';
 import { t } from '../i18n';
+import { logout as authLogout } from '../features/auth/authClient';
 
 export function Me() {
   const { profile, update } = useProfile();
@@ -65,6 +66,9 @@ export function Me() {
             <dd aria-live="polite" data-testid="badge-list">{(profile.badges && profile.badges.length > 0) ? profile.badges.join(', ') : '—'}</dd>
           </div>
         </dl>
+        <div>
+          <button type="button" className="btn" onClick={() => authLogout()}>Logout</button>
+        </div>
 
         {canLink ? (
           <button

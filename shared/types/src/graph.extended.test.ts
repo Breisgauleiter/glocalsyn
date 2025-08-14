@@ -2,6 +2,12 @@ import { describe, it, expect } from 'vitest';
 import { createGraphObject, isGraphEdge, getRecommendations, GraphEdge } from './graph';
 
 describe('extended graph types', () => {
+  it('createGraphObject provides empty diversityTags and zero scores by default', () => {
+    const obj = createGraphObject('user', 'u9', 'User 9');
+    expect(obj.diversityTags).toEqual([]);
+    expect(obj.bridgeScore).toBe(0);
+    expect(obj.activityScore).toBe(0);
+  });
   it('createGraphObject applies defaults and overrides', () => {
     const obj = createGraphObject('quest', 'q1', 'Quest 1', { bridgeScore: 2, diversityTags: ['art'], extra: true });
     expect(obj._key).toBe('q1');

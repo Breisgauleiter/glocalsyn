@@ -1,33 +1,63 @@
-import { FormEvent, useState } from 'react';
+import { FormEvent, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useAuthMock } from './authStore';
+import { requestMagicLink, consumeMagicLink, getMe } from './authClient';
 
 export function Login() {
   const nav = useNavigate();
-  const { login } = useAuthMock();
-  const [name, setName] = useState('');
+  const [email, setEmail] = useState('');
+  const [status, setStatus] = useState<'idle'|'sent'|'verifying'|'error'>('idle');
+  const [error, setError] = useState<string|undefined>();
+  const [devToken, setDevToken] = useState<string>('');
+
+  useEffect(() => {
+    // Restore session if present
+    getMe().then(u => { if (u) nav('/'); }).catch(() => {});
+  }, [nav]);
 
   function onSubmit(e: FormEvent) {
     e.preventDefault();
-    login(name || 'Gast');
-    nav('/profile-setup');
+    setStatus('idle'); setError(undefined);
+    requestMagicLink(email)
+      .then((res: any) => {
+        setStatus('sent');
+        if (res?.devToken) setDevToken(res.devToken);
+      })
+      .catch((err) => { setStatus('error'); setError(err?.message || 'Fehler'); });
+  }
+  async function onConsume(e: FormEvent) {
+    e.preventDefault();
+    setStatus('verifying'); setError(undefined);
+    try {
+      await consumeMagicLink(devToken);
+      nav('/profile-setup');
+    } catch (err: any) {
+      setStatus('error'); setError(err?.message || 'Fehler');
+    }
   }
 
   return (
-    <form onSubmit={onSubmit} aria-labelledby="login-title" className="container stack glass-card" role="form">
+    <section className="container stack glass-card" aria-labelledby="login-title">
       <h1 id="login-title" className="h1">Login</h1>
-      <label htmlFor="name">Name</label>
-      <input
-        id="name"
-        name="name"
-        value={name}
-        onChange={(e) => setName(e.currentTarget.value)}
-        placeholder=""
-        aria-describedby="name-hint"
-        className="input"
-      />
-      <div id="name-hint" className="p">Kurzer Name, keine Sonderzeichen.</div>
-      <button type="submit" className="btn btn-primary">Weiter</button>
-    </form>
+      <form onSubmit={onSubmit} role="form" className="stack">
+        <label htmlFor="email">E-Mail</label>
+        <input id="email" name="email" type="email" className="input" value={email} onChange={(e)=>setEmail(e.currentTarget.value)} required />
+        <small className="muted">Wir senden dir einen Magic Link.</small>
+        <button type="submit" className="btn btn-primary" disabled={!email}>Link senden</button>
+      </form>
+      {status === 'sent' && (
+        <div className="stack" role="status" aria-live="polite">
+          <strong>Link gesendet.</strong>
+          <small>Prüfe dein Postfach. Im Dev-Modus kannst du den Token unten einfügen.</small>
+        </div>
+      )}
+      {(status === 'sent' || devToken) && (
+        <form onSubmit={onConsume} className="stack" aria-label="Dev Verification">
+          <label htmlFor="token">Token (Dev)</label>
+          <input id="token" name="token" className="input" value={devToken} onChange={(e)=>setDevToken(e.currentTarget.value)} placeholder="dev token…" />
+          <button type="submit" className="btn">Anmelden</button>
+        </form>
+      )}
+      {status === 'error' && <p role="alert" style={{ color: 'var(--danger,#b00)' }}>{error}</p>}
+    </section>
   );
 }

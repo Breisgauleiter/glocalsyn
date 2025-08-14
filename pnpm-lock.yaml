@@ -141,6 +141,9 @@ importers:
       '@syntopia/types':
         specifier: workspace:*
         version: link:../../shared/types
+      '@syntopia/utils':
+        specifier: workspace:*
+        version: link:../../shared/utils
       arangojs:
         specifier: ^9.0.0
         version: 9.3.0
@@ -196,6 +199,12 @@ importers:
       vitest:
         specifier: ^1.6.0
         version: 1.6.1(@types/node@20.19.10)(jsdom@25.0.1)
+
+  shared/utils:
+    devDependencies:
+      vitest:
+        specifier: 2.1.9
+        version: 2.1.9(@types/node@20.19.10)(jsdom@25.0.1)
 
 packages:
 

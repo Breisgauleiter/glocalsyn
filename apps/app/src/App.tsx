@@ -1,8 +1,10 @@
 import React from 'react';
 import { Outlet, NavLink } from 'react-router-dom';
 import { Background } from './components/Background';
+import { useAuth } from './features/auth/authStore';
 
 export function App() {
+  const { user, logout } = useAuth();
   return (
     <div className="app-shell">
   <a href="#main-content" className="skip-link">Zum Inhalt springen</a>
@@ -10,7 +12,16 @@ export function App() {
       <header className="app-header glass-surface glass-header" role="banner">
         <strong>Syntopia</strong>
         <nav aria-label="Sekundärnavigation">
-          {/* ... could add language toggle or help later ... */}
+          <ul style={{ display: 'flex', gap: 12, listStyle: 'none', margin: 0, padding: 0 }}>
+            {user ? (
+              <>
+                <li aria-live="polite">Hallo, <strong>{user.displayName || user.id}</strong></li>
+                <li><button className="btn btn-sm" onClick={() => logout()}>Logout</button></li>
+              </>
+            ) : (
+              <li><NavLink to="/login" className={({ isActive }) => isActive ? 'active' : undefined}>Login</NavLink></li>
+            )}
+          </ul>
         </nav>
       </header>
   <main id="main-content" className="app-main">

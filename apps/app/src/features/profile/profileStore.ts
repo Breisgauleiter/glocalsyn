@@ -1,5 +1,7 @@
 import { useEffect, useState } from 'react';
+import { fetchUserProfile } from '../graph/graphClient';
 import type { SCLLevel } from '../../../../../shared/types/src';
+import { useAuth } from '../auth/authStore';
 
 export interface Profile {
   name?: string;
@@ -18,13 +20,14 @@ const DEFAULT_PROFILE: Profile = { scl: 1 as SCLLevel, githubLinked: false, xp: 
 
 export function useProfile() {
   const [profile, setProfile] = useState<Profile>(DEFAULT_PROFILE);
+  const { user } = useAuth();
 
   useEffect(() => {
+    let cancelled = false;
     const raw = localStorage.getItem('profile');
     if (raw) {
       try {
         const parsed = JSON.parse(raw) as Partial<Profile>;
-        // Normalize githubRepos if someone stored a string earlier
         const normalized: Partial<Profile> = {
           ...parsed,
           githubRepos: Array.isArray((parsed as any).githubRepos)
@@ -45,11 +48,24 @@ export function useProfile() {
               : parsed.githubLabels,
         };
         setProfile({ ...DEFAULT_PROFILE, ...normalized });
-      } catch {
-        // Intentionally ignore JSON parse errors; fall back to DEFAULT_PROFILE
-      }
+      } catch { /* ignore */ }
     }
-  }, []);
+  // Remote hydrate using authenticated user id (fallback to demo-user for tests/guests)
+    (async () => {
+      try {
+    const key = user?.id || 'demo-user';
+    const remote = await fetchUserProfile(key);
+        if (!remote || cancelled) return;
+        setProfile(p => {
+          if (p.name && p.name !== 'Demo User') return p; // keep local customized
+          const merged = { ...p, name: remote.name };
+          localStorage.setItem('profile', JSON.stringify(merged));
+          return merged;
+        });
+      } catch { /* swallow */ }
+    })();
+  return () => { cancelled = true; };
+  }, [user?.id]);
 
   function update(next: Partial<Profile>) {
     setProfile((p) => {

@@ -12,7 +12,8 @@
   "test": "turbo run test",
   "test:ci": "pnpm --filter @syntopia/app test:fast && pnpm --filter @syntopia/app test:integration && pnpm --filter @syntopia/app e2e",
   "graph:dev": "pnpm --filter @syntopia/graph-service dev",
-  "graph:test": "pnpm --filter @syntopia/graph-service test"
+  "graph:test": "pnpm --filter @syntopia/graph-service test",
+  "pr:suggest": "node tools/pr-suggest-issues.mjs"
   },
   "devDependencies": {
     "turbo": "^2.0.6",

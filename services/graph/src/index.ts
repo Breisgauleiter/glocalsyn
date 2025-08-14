@@ -1,6 +1,7 @@
 /** Graph Service (ArangoDB) with recommendations + map snapshot */
 import { Database, aql } from 'arangojs';
 import Fastify from 'fastify';
+import { computeEtag } from '@syntopia/utils';
 // Import shared graph types via workspace package (barrel export)
 import type { GraphObject as SharedGraphObject, GraphEdge as SharedGraphEdge, GraphRecommendation } from '@syntopia/types';
 
@@ -88,13 +89,48 @@ export async function bootstrap() {
     app.get('/health', async () => ({ ok: true }));
     app.get('/graph/recommendations/:userKey', async (req, reply) => {
       const { userKey } = req.params as any;
-      try { return { items: await getRecommendations(db, userKey, 10) }; }
+      try {
+        const items = await getRecommendations(db, userKey, 10);
+        const payload = { items };
+        const etag = computeEtag(payload);
+        if (req.headers['if-none-match'] === etag) {
+          reply.code(304).header('ETag', etag).send();
+          return;
+        }
+        reply.header('ETag', etag);
+        return payload;
+      }
       catch (e) { reply.code(500); return { error: (e as Error).message }; }
     });
-    app.get('/graph/map-snapshot', async () => {
+    app.get('/graph/map-snapshot', async (req, reply) => {
       const nodes: GraphObject[] = await (await db.query(aql`FOR o IN ${db.collection(COLLECTIONS.objects)} LIMIT 200 RETURN o`)).all();
       const edges = await (await db.query(aql`FOR e IN ${db.collection(COLLECTIONS.edges)} LIMIT 400 RETURN e`)).all();
-      return { nodes, edges, meta: { generatedAt: Date.now(), nodeCount: nodes.length, edgeCount: edges.length } };
+      const payload = { nodes, edges, meta: { generatedAt: Date.now(), nodeCount: nodes.length, edgeCount: edges.length } };
+      const etag = computeEtag(payload);
+      if (req.headers['if-none-match'] === etag) {
+        reply.code(304).header('ETag', etag).send();
+        return;
+      }
+      reply.header('ETag', etag);
+      return payload;
+    });
+    // Minimal profile endpoint placeholder with ETag
+    app.get('/profile/:userKey', async (req, reply) => {
+      const { userKey } = req.params as any;
+      try {
+        const cursor = await db.query(aql`FOR o IN ${db.collection(COLLECTIONS.objects)} FILTER o._key == ${userKey} LIMIT 1 RETURN o`);
+        const obj = (await cursor.all())[0] || { _key: userKey, type: 'user', name: 'Unbekannt' };
+        const payload = { profile: { key: obj._key, name: obj.name, type: obj.type } };
+        const etag = computeEtag(payload);
+        if (req.headers['if-none-match'] === etag) {
+          reply.code(304).header('ETag', etag).send();
+          return;
+        }
+        reply.header('ETag', etag);
+        return payload;
+      } catch (e) {
+        reply.code(500); return { error: (e as Error).message };
+      }
     });
     const port = Number(process.env.GRAPH_PORT || 4050);
     await app.listen({ port, host: '0.0.0.0' });

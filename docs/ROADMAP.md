@@ -50,7 +50,7 @@
  - Basis-Konzept „Graph-First UI“ dokumentiert (Richtlinien für ersetzbare Listen → interaktive Netzwerke)
 
 
-#### Fortschritt (12.08.2025)
+#### Fortschritt (13.08.2025)
 - Account‑Link Flow (Opt‑in) [DELIVERED]
 - Read‑only GitHub Issues Adapter [DELIVERED] (Feature‑Flag: VITE_USE_GITHUB_ADAPTER, default off)
 - Repo‑Auswahl UI (mehrere Repos, Persistenz im Profil) [DELIVERED]
@@ -62,18 +62,38 @@
  - Graph-First UI Initiative: Evaluierung 3D-Force-Libs (react-force-graph-3d, drei.js basierte Optionen) [PLANNED]
  - Accessibility & Performance Leitplanken für 3D: Fallback-Strategie skizziert (SSR-Liste / 2D Force) [PLANNED]
 
-Nächste Schritte (kleine PRs):
-- TAO-Graph-Modell Verfeinerung: shared/types Erweiterung (Brücken-Attribute, Diversity Tags) + Service Endpoints
-- "Heute dran..." Empfehlungen Placeholder (Home) mit erklärbarem Mock-Reason (Brückenquest, Vielfalt, Fortsetzung)
-- Pagination & Limit + defensive Rate-Limit-Handhabung im GitHub Adapter
-- Semantik: Vorbereitung PR→Issue Close Mapping (Proof Voraussetzung ab SCL ≥ 4, noch read‑only)
-- I18n: DE/EN für neue Graph/Empfehlungs-UI Strings
-- OAuth2 Spezifikation konkretisieren (Start/Callback Endpoints, State, Token Persist Layer) → Übergang Sprint 04
-- Sync Pipeline v1 Draft: Polling Contract (ETag, If-None-Match) + Delta Merge Strategie
-- Optional: Memory Profiling Ticket (Rückweg zu parallelem Vitest falls machbar)
- - 3D Graph Map POC implementieren (Feature-Flag `VITE_ENABLE_GRAPH_3D` + Fallback Rendering testen)
- - Graph-UI Guidelines Markdown anlegen (Interaktionsprinzipien, Node-Typ Farben, Fokus-/Kontext-Modus)
- - Messpunkte definieren: FPS (≥ 50 Ziel mobil), Initial Payload Budget, Node Count Threshold für Auto-Downgrade
+#### Update (14.08.2025)
+- Auth: Magic‑Link Dev‑Token E2E hinzugefügt (Login → Token → Wizard → Quests) [DELIVERED]
+- Cleanup: Duplikat `authStore.tsx` entfernt (nur `authStore.ts` bleibt) [DELIVERED]
+
+Sprint 03 Restarbeiten (kleine PRs – Fokus auf Graph & Empfehlungen):
+1. TAO-Graph-Modell Verfeinerung: shared/types Erweiterung (bridgeScore, diversityTags, activityScore Defaults) + Service Endpoints (Map Snapshot angereichert) [DONE]
+2. "Heute dran..." Empfehlungen Placeholder (Home) + Live Fetch + ETag Cache + E2E Test [DONE]
+3. Pagination & Limit + defensive Rate-Limit-Handhabung im GitHub Adapter (cursor-first) [DONE]
+4. Semantik: Vorbereitung PR→Issue Close Mapping (Proof Voraussetzung ab SCL ≥ 4, read‑only Phase) [STUB ADDED]
+5. I18n: DE/EN Strings für neue Graph/Empfehlungs-UI + Reason Codes [DONE]
+6. OAuth2 Spezifikation konkretisieren (Start/Callback Endpoints, State, Token Persist Layer) – Draft fertigstellen [DONE]
+7. Sync Pipeline v1 Draft: Polling Contract (ETag, If-None-Match) + Delta Merge Strategie + util Stub [DONE]
+8. Optional: Memory Profiling Ticket (Pfad zurück zu parallelem Vitest falls stabil) [OPEN]
+	- Draft ticket created (docs/MEMORY_PROFILING_TICKET.md) [DONE]
+9. 3D Graph Map POC implementieren (Feature-Flag `VITE_ENABLE_GRAPH_3D` + Fallback Rendering testen) [PARTIAL – Downgrade + Fallback + FPS Test]
+10. Graph-UI Guidelines Markdown anlegen (Interaktionsprinzipien, Node-Typ Farben, Fokus-/Kontext-Modus) [DONE]
+11. Messpunkte definieren: FPS (≥ 50 Ziel mobil), Initial Payload Budget, Node Count Threshold für Auto-Downgrade [PARTIAL – Sampler + Downgrade Test]
+12. Telemetry Dispatcher (buffer + periodic flush) [DONE]
+13. Profile Endpoint + Client ETag Hydration (name) [DONE]
+14. Semantic PR→Issue Suggestion Utility (heuristic) [DONE]
+
+Sprint 04 Seed Backlog (Hubs & Lokale Partner – vorbereitet während Abschluss Sprint 03):
+1. Hub-Directory Datenmodell (Region, Tags, Capacity) + Indexe
+2. Hub Listing UI (Mobile-first, Suche + Filter) mit Graph-Fallback (Liste) & optional Graph Overlay
+3. Partner-Verknüpfung (Proof Validierungsrolle) – Rollenmodell Erweiterung
+4. Erste Hub-spezifische Quests (belongs_to Edges + UI Badge)
+5. Performance Pass: Level-of-Detail (LOD) / Auto-Downgrade Schwellenwerte aus Messpunkten anwenden
+6. OAuth2 Implementierung (Code Flow) basierend auf spezifiziertem Draft – minimaler Token Store, Link/Unlink Audit Events
+7. GitHub Sync v1 (Polling) – Issue Delta Import + Quest Aktualisierung
+8. Review-Queue Erweiterung: Filter nach Hub / Partner
+9. Telemetry Events für graph_node_focus & recommendation_explained (Tracking Erfolgs-KPIs)
+10. A11y Audit der neuen Graph- & Empfehlungskomponenten (Tab Reihenfolge, ARIA Roles, Fokus-Indikatoren)
 
 ## Phase 2: Community Features (Sprints 4-6)
 
@@ -154,7 +174,6 @@ Ziel: Wo immer Beziehungen Mehrwert stiften (Kontakte, Gruppen, Quests, Hubs, Re
 
 ### Technologiekandidat
 Primär: react-force-graph-3d (Three.js basierend) – Gründe: Stabil etablierte API, Force-Engine konfigurierbar, VR/AR Erweiterbarkeit. Alternativen im Evaluations-Doc: sigma.js (2D), d3-force + custom Three Layer (höherer Wartungsaufwand), vivagraph.
->>>>>>> 283933c (feat(graph-3d): Step 4 POC + tests)
 ### Tasks (laufend)
 - Library Evaluation Report (FPS Benchmarks, Memory Profiling)
 - Fallback Strategy Component (GraphFallbackList)

@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { fetchCachedJson } from '../features/graph/graphClient';
 import { Graph3DMap } from '../features/graph/Graph3DMap';
 
 // Allow test override via global (mirrors recommendations flag pattern)
@@ -26,12 +27,10 @@ export function Map() {
 
   useEffect(() => {
     if (!enabled) return;
-    (async () => {
+  (async () => {
       try {
-        const base = (import.meta as any).env?.VITE_GRAPH_URL || 'http://localhost:4050';
-        const res = await fetch(`${base}/graph/map-snapshot`);
-        if (!res.ok) throw new Error(`HTTP ${res.status}`);
-        const json = await res.json();
+    const base = (import.meta as any).env?.VITE_GRAPH_URL || 'http://localhost:4050';
+    const json = await fetchCachedJson(`${base}/graph/map-snapshot`);
         setData({ nodes: json.nodes || [], edges: json.edges || [] });
       } catch (e: any) {
         setError(e.message || 'Fehler');

@@ -12,4 +12,17 @@ export default defineConfig({
       'three/webgpu': path.resolve(__dirname, 'src/shims/three-webgpu.ts'),
     },
   },
+  server: {
+    proxy: {
+      // Auth endpoints proxied to auth service to keep cookies same-origin in dev
+      '/auth': {
+        target: 'http://localhost:4060',
+        changeOrigin: true,
+      },
+      '/me': {
+        target: 'http://localhost:4060',
+        changeOrigin: true,
+      },
+    },
+  },
 });

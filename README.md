@@ -31,6 +31,33 @@ More details: see [docs/GETTING_STARTED.md](docs/GETTING_STARTED.md)
 
 ---
 
+## PR → Issue Suggestion Helper
+
+To automatically suggest related issues for a pull request title (heuristic token overlap):
+
+```sh
+pnpm pr:suggest "feat: graph 3d performance downgrade" ./issues.json
+```
+
+`issues.json` should be an array like:
+
+```json
+[
+	{ "number": 42, "title": "Graph 3D performance downgrade mechanism" },
+	{ "number": 81, "title": "Add hub directory listing" }
+]
+```
+
+Output format per line:
+
+```
+#<issueNumber>\t<score>\t<title>
+```
+
+Use the score (0–1) to decide which issues to link in the PR description. Threshold default is 0.15.
+
+---
+
 ## Testing Conventions (UI Interaction)
 
 We use React Testing Library + `user-event` wrapped in small helper utilities (`src/test/testActions.ts`) to keep tests realistic (event sequencing, async flushing) and readable.

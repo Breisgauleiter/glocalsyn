@@ -1,0 +1,12 @@
+{
+  "name": "@syntopia/utils",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "main": "src/index.ts",
+  "license": "MIT",
+  "dependencies": {},
+  "devDependencies": {
+    "vitest": "2.1.9"
+  }
+}

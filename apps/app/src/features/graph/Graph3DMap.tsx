@@ -1,4 +1,6 @@
 import { Suspense, useEffect, useRef, useState } from 'react';
+import { FpsSampler } from '../../utils/fpsSampler';
+import { emit as emitTelemetry } from '../../utils/telemetry';
 import type { GraphObject } from '@syntopia/types';
 
 // Test / override hooks (optional)
@@ -55,18 +57,49 @@ export function Graph3DMap(props: Graph3DMapProps) {
     return () => { mounted = false; clearInterval(interval); };
   }, []);
 
-  const fallbackNeeded = overThreshold || !webgl || !ReadyComp;
+  const [downgraded, setDowngraded] = useState(false);
+  useEffect(() => {
+    if (overThreshold) return; // already list
+    if (!webgl || !ReadyComp) return; // wait for ready
+    let sampler: FpsSampler | null = null;
+    // only run in browser and not already downgraded
+    sampler = new FpsSampler({ downgradeThresholdFps: 45, onDowngrade: () => setDowngraded(true) });
+    sampler.start();
+    return () => { sampler?.stop(); };
+  }, [webgl, ReadyComp, overThreshold]);
+
+  const fallbackNeeded = overThreshold || !webgl || !ReadyComp || downgraded;
 
   if (fallbackNeeded) {
     return (
       <div ref={containerRef} data-testid="graph-fallback" style={{ maxHeight: props.height || 360, overflow: 'auto' }}>
         <ul style={{ listStyle: 'none', padding: 0, margin: 0 }}>
           {props.nodes.slice(0, 50).map(n => (
-            <li key={n._key} style={{ padding: '4px 8px', borderBottom: '1px solid #2223' }}>{n.name}</li>
+            <li key={n._key} style={{ padding: 0, borderBottom: '1px solid #2223' }}>
+              <button
+                type="button"
+                onFocus={() => emitTelemetry({ ts: Date.now(), type: 'graph_node_focus', nodeId: `${n.type}/${n._key}`, nodeType: n.type, method: 'keyboard' })}
+                style={{
+                  display: 'block',
+                  width: '100%',
+                  textAlign: 'left',
+                  background: 'none',
+                  border: 'none',
+                  padding: '4px 8px',
+                  color: 'inherit',
+                  font: 'inherit',
+                  cursor: 'pointer'
+                }}
+              >
+                {n.name}
+              </button>
+            </li>
           ))}
         </ul>
-        {overThreshold && (
-          <p style={{ fontSize: 12, opacity: 0.7, padding: '4px 8px' }}>3D deaktiviert (&gt;{threshold} Knoten) – Fallback Liste.</p>
+        {(overThreshold || downgraded) && (
+          <p style={{ fontSize: 12, opacity: 0.7, padding: '4px 8px' }}>
+            3D deaktiviert {overThreshold ? `(>${threshold} Knoten)` : '(Performance)'} – Fallback Liste.
+          </p>
         )}
       </div>
     );
@@ -87,7 +120,10 @@ export function Graph3DMap(props: Graph3DMapProps) {
           enableNodeDrag={false}
           warmupTicks={30}
           cooldownTicks={60}
-          onNodeHover={(n: any) => { if ((import.meta as any).env?.DEV) console.log('[graph3d][hover]', n?.id); }}
+          onNodeHover={(n: any) => {
+            if ((import.meta as any).env?.DEV) console.log('[graph3d][hover]', n?.id);
+            if (n?.id) emitTelemetry({ ts: Date.now(), type: 'graph_node_focus', nodeId: n.id, nodeType: String(n.id).split('/')[0], method: 'hover' });
+          }}
         />
       </Suspense>
     </div>

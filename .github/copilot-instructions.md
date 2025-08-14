@@ -85,3 +85,29 @@ Mobile-first, kooperatives Real-World-Aufbauspiel. Klare, freundliche Sprache. D
 **Hinweise**
 - Kleine PRs (≤150 Zeilen Diff), Tests zuerst
 - Keine GPL/AGPL-Dependencies
+
+### Laufende Sprint 03 Fokuspunkte (Graph & Empfehlungen)
+Kurzziel: Explainable Recommendations + angereicherter Graph Snapshot + 3D POC hinter Flag.
+
+Priorisierte kleine PR Strecken (Reihenfolge optimiert für Entkopplung):
+1. Shared Graph Types Erweiterung (diversityTags, bridgeScore, activityScore Defaults) – Tests für Defaults.
+2. Graph Service Map Snapshot angereichert (bereits begonnen) + Test (Meta Felder, Defaults) – DONE teilw. weiterführen.
+3. Home: "Heute dran..." Placeholder Komponenten + Mock-Reasons (bridge/diversity/continuation) + i18n Keys (DE/EN).
+4. Recommendation Reason Codes Erklärung (Mapping -> i18n) + Unit Test pro Code.
+5. GitHub Adapter: Pagination (cursor param) + defensive Rate Limit Handling (Retry-After respektieren) + Tests (Mock Fetch).
+6. OAuth2 Spec Draft finalisieren (Endpoints, State, PKCE Hinweis, Persist Layer Interfaces) – Markdown.
+7. Sync Pipeline v1 Draft (ETag / If-None-Match contract) – Markdown + minimal util Stub.
+8. 3D Graph POC Component (feature flag VITE_ENABLE_GRAPH_3D) + Fallback 2D/List; smoke test rendering.
+9. Graph-UI Guidelines Doc: Interaktion, Node Typ Farben, Fokus / Kontext.
+10. Telemetry Events Schema: graph_node_focus, recommendation_explained – add to telemetry types + test.
+11. Metrics Definition: FPS sampling util + threshold-based downgrade hook (stub + test).
+
+Qualitäts-Checks je PR:
+- Unit + vorhandene E2E happy path grün.
+- A11y: Labels / Rollen für neue Komponenten.
+- Keine neuen Peer-Dependency Warnings (three ggf. Update Ticket separate).
+
+### Vorausplanung Sprint 04 (Seed Backlog)
+Nicht umsetzen in Sprint 03 außer Abhängigkeiten: Hubs Data Model, OAuth2 Implementierung, GitHub Sync Polling, LOD Performance Pass.
+
+Definition "Ready" für diese Items: Datenmodell skizziert, Akzeptanzkriterien & Risiken (Performance, A11y) dokumentiert.

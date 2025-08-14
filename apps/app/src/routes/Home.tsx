@@ -1,6 +1,10 @@
 import { Link } from 'react-router-dom';
 import { useEffect, useState } from 'react';
 import { fetchRecommendations } from '../features/graph/graphClient';
+import { t } from '../i18n';
+import { mapExplanation } from '../features/graph/recommendationReasons';
+import { emit as emitTelemetry } from '../utils/telemetry';
+import { useAuth } from '../features/auth/authStore';
 
 interface RecItem { id: string; title: string; reason: string; }
 
@@ -13,24 +17,31 @@ function useRecommendations(): { items: RecItem[]; loading: boolean; error: stri
   const [items, setItems] = useState<RecItem[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const { user } = useAuth();
   useEffect(() => {
   if (!isRecsEnabled()) return; // remain empty
     let cancelled = false;
     (async () => {
       setLoading(true);
       try {
-        // TODO: derive userKey from auth/profile store; placeholder static until auth integration
-        const recs = await fetchRecommendations({ userKey: 'demo-user', limit: 3 });
+        const userKey = user?.id || 'demo-user';
+        const recs = await fetchRecommendations({ userKey, limit: 3 });
         if (cancelled) return;
         if (recs.length === 0) {
-          // fallback placeholder if service empty
           setItems([
-            { id: 'q_bridge', title: 'Verbinde zwei Hubs', reason: 'Brücken‑Quest fördert Netzwerk' },
-            { id: 'q_variety', title: 'Teile einen Lern-Link', reason: 'Vielfalt: anderer Quest‑Typ' },
-            { id: 'q_progress', title: 'Peer‑Bestätigung holen', reason: 'Fortsetzung: ausstehender Review' },
+            { id: 'q_bridge', title: 'Verbinde zwei Hubs', reason: t('recs.reason.bridge') },
+            { id: 'q_variety', title: 'Teile einen Lern-Link', reason: t('recs.reason.diversity') },
+            { id: 'q_progress', title: 'Peer‑Bestätigung holen', reason: t('recs.reason.continuation') },
           ]);
         } else {
-          setItems(recs.map(r => ({ id: r.node._key, title: r.node.name, reason: r.reasons[0]?.explanation || r.reasons[0]?.code || 'Empfehlung' })));
+          setItems(recs.map(r => {
+            const first = r.reasons[0];
+            const mapped = first ? mapExplanation(first.code, first.explanation) : { key: 'recs.reason.social_proof', fallback: 'Empfehlung' };
+            const reasonText = t(mapped.key);
+            // Emit explanation event for first render of each rec (simple heuristic)
+            emitTelemetry({ ts: Date.now(), type: 'recommendation_explained', nodeId: r.node._key, reasonCode: first.code, locale: 'de' });
+            return { id: r.node._key, title: r.node.name, reason: reasonText };
+          }));
         }
       } catch (e: any) {
         if (cancelled) return;
@@ -46,7 +57,7 @@ function useRecommendations(): { items: RecItem[]; loading: boolean; error: stri
       }
     })();
     return () => { cancelled = true; };
-  }, []);
+  }, [user?.id]);
   return { items, loading, error };
 }
 
@@ -57,11 +68,11 @@ export function Home() {
       <h1 id="home-title" className="h1">Syntopia</h1>
       <p className="p">Willkommen! Starte mit einer Mini‑Quest in drei Taps.</p>
       <p>
-        <Link to="/login" aria-label="Jetzt starten" className="btn btn-primary">Jetzt starten</Link>
+        <Link to="/profile-setup" aria-label="Jetzt starten" className="btn btn-primary">Jetzt starten</Link>
       </p>
-  {isRecsEnabled() && (
+    {isRecsEnabled() && (
         <div className="stack" aria-labelledby="today-rec-title">
-          <h2 id="today-rec-title" className="h2">Heute dran…</h2>
+      <h2 id="today-rec-title" className="h2">{t('recs.heading.today')}</h2>
           <ul className="stack" aria-label="Empfehlungen" style={{ listStyle: 'none', padding: 0 }}>
             {recs.map(r => (
               <li key={r.id} className="card" data-testid="rec-item">
@@ -74,7 +85,7 @@ export function Home() {
           </ul>
           {loading && <p role="status" aria-live="polite">Lade Empfehlungen…</p>}
           {error && <p role="alert" style={{ color: 'var(--danger, #b00)' }}>Empfehlungen nicht erreichbar – zeige Platzhalter.</p>}
-          <p className="caption" style={{ opacity: 0.7 }}>Prototypische Empfehlungen – erklärt, transparent, lokal.</p>
+          <p className="caption" style={{ opacity: 0.7 }}>{t('recs.prototype.caption')}</p>
         </div>
       )}
     </section>

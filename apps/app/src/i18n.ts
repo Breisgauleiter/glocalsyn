@@ -5,6 +5,13 @@ type Lang = 'de' | 'en';
 
 const DICT: Record<Lang, Record<string, string>> = {
   de: {
+  'recs.heading.today': 'Heute dran…',
+  'recs.prototype.caption': 'Prototypische Empfehlungen – erklärt, transparent, lokal.',
+  'recs.reason.bridge': 'Brücken‑Quest fördert Netzwerk',
+  'recs.reason.diversity': 'Vielfalt: anderer Quest‑Typ',
+  'recs.reason.continuation': 'Fortsetzung: ausstehender Schritt',
+  'recs.reason.activity': 'Aktivität: zuletzt aktiv',
+  'recs.reason.social_proof': 'Sozialer Beweis: verknüpfte Knoten',
     'me.title': 'Ich',
     'me.description': 'Profil & Einstellungen.',
     'me.account.section': 'Account',
@@ -25,6 +32,13 @@ const DICT: Record<Lang, Record<string, string>> = {
     'me.github.repoSelection.empty': 'Keine Standard-Repos konfiguriert.',
   },
   en: {
+  'recs.heading.today': 'Today focus…',
+  'recs.prototype.caption': 'Prototype recommendations – explained, transparent, local.',
+  'recs.reason.bridge': 'Bridge quest strengthens network',
+  'recs.reason.diversity': 'Diversity: different quest type',
+  'recs.reason.continuation': 'Continuation: pending step',
+  'recs.reason.activity': 'Activity: recently active',
+  'recs.reason.social_proof': 'Social proof: connected nodes',
     'me.title': 'Me',
     'me.description': 'Profile & Settings.',
     'me.account.section': 'Account',

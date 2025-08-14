@@ -43,6 +43,36 @@ describe('RealGithubAdapter (read-only)', () => {
     }) as any;
   });
 
+  it('applies cursor (page) when provided (base64 p:2)', async () => {
+    let requestedUrl: string | undefined;
+    // Mock fetch capturing page param
+    // @ts-ignore
+    global.fetch = async (url: string) => {
+      requestedUrl = url;
+      return new Response('[]', { status: 200, headers: { 'Content-Type': 'application/json' } });
+    };
+    const cursor = btoa('p:2');
+    const adapter = new RealGithubAdapter({ perRepoLimit: 5, cursor });
+    await adapter.listIssues(['owner/repo']);
+    expect(requestedUrl).toMatch(/page=2/);
+  });
+
+  it('retries on 429 with Retry-After then succeeds', async () => {
+    let calls = 0;
+    // @ts-ignore
+    global.fetch = async () => {
+      calls++;
+      if (calls === 1) {
+        return new Response('Rate limited', { status: 429, headers: { 'Retry-After': '0' } });
+      }
+      return new Response('[]', { status: 200, headers: { 'Content-Type': 'application/json' } });
+    };
+    const adapter = new RealGithubAdapter({ perRepoLimit: 1 });
+    const issues = await adapter.listIssues(['owner/repo']);
+    expect(issues.length).toBe(0);
+    expect(calls).toBeGreaterThanOrEqual(2);
+  });
+
   afterEach(() => {
     global.fetch = originalFetch as any;
     vi.clearAllMocks();

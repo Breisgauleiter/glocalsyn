@@ -5,6 +5,7 @@ export interface GithubAdapterOptions {
   perRepoLimit?: number; // cap number of issues per repo
   state?: 'open' | 'closed' | 'all';
   labels?: string[];
+  cursor?: string; // pagination cursor (simple since GitHub issues API uses page numbers; we map cursor -> page n)
 }
 
 export interface GithubAdapter {
@@ -16,12 +17,14 @@ export class RealGithubAdapter implements GithubAdapter {
   private perRepoLimit: number;
   private state: 'open' | 'closed' | 'all';
   private labels?: string[];
+  private cursor?: string;
 
   constructor(opts: GithubAdapterOptions = {}) {
     this.token = opts.token;
     this.perRepoLimit = opts.perRepoLimit ?? 10;
     this.state = opts.state ?? 'open';
     this.labels = opts.labels;
+    this.cursor = opts.cursor; // expected to be base64 encoded page number or undefined
   }
 
   async listIssues(repos: string[]): Promise<GitHubIssueLite[]> {
@@ -29,6 +32,14 @@ export class RealGithubAdapter implements GithubAdapter {
     if (this.token) headers['Authorization'] = `Bearer ${this.token}`;
 
     const qs = new URLSearchParams({ state: this.state, per_page: String(this.perRepoLimit) });
+    // Decode cursor -> page number (GitHub: page=1..N). Cursor format: b64('p:<n>')
+    if (this.cursor) {
+      try {
+        const decoded = atob(this.cursor);
+        const match = /^p:(\d+)$/.exec(decoded);
+        if (match) qs.set('page', match[1]);
+      } catch { /* ignore invalid cursor */ }
+    }
     if (this.labels?.length) qs.set('labels', this.labels.join(','));
 
     const results = await Promise.all(
@@ -36,27 +47,41 @@ export class RealGithubAdapter implements GithubAdapter {
         // Basic validation for owner/repo
         if (!/^[A-Za-z0-9_.-]+\/[A-Za-z0-9_.-]+$/.test(repo)) return [] as GitHubIssueLite[];
         const url = `https://api.github.com/repos/${repo}/issues?${qs.toString()}`;
-        const res = await fetch(url, { headers });
-        if (!res.ok) {
-          // Skip this repo on API error; keep adapter tolerant for now (read-only, best-effort)
-          return [] as GitHubIssueLite[];
+        let attempt = 0;
+        const maxAttempts = 3;
+  while (attempt < maxAttempts) {
+          const res = await fetch(url, { headers });
+          if (res.status === 429) {
+            // Basic backoff using Retry-After header (seconds). If missing, exponential fallback.
+            const ra = res.headers.get('Retry-After');
+            const waitMs = ra ? parseInt(ra, 10) * 1000 : Math.min(1000 * Math.pow(2, attempt), 5000);
+            attempt++;
+            if (attempt >= maxAttempts) return [] as GitHubIssueLite[];
+            if (waitMs > 0) {
+              await new Promise(r => setTimeout(r, waitMs));
+            }
+            continue;
+          }
+          if (!res.ok) {
+            return [] as GitHubIssueLite[];
+          }
+          const data: any[] = await res.json();
+          const mapped: GitHubIssueLite[] = [];
+          for (const it of data) {
+            if (it.pull_request) continue;
+            mapped.push({
+              id: it.id,
+              number: it.number,
+              title: it.title,
+              body: it.body ?? undefined,
+              url: it.html_url,
+              repo,
+              labels: Array.isArray(it.labels) ? it.labels.map((l: any) => (typeof l === 'string' ? l : l?.name)).filter(Boolean) : undefined,
+            });
+          }
+          return mapped;
         }
-        const data: any[] = await res.json();
-        const mapped: GitHubIssueLite[] = [];
-        for (const it of data) {
-          // Filter out PRs (GitHub returns PRs in the issues list when using the issues endpoint)
-          if (it.pull_request) continue;
-          mapped.push({
-            id: it.id,
-            number: it.number,
-            title: it.title,
-            body: it.body ?? undefined,
-            url: it.html_url,
-            repo,
-            labels: Array.isArray(it.labels) ? it.labels.map((l: any) => (typeof l === 'string' ? l : l?.name)).filter(Boolean) : undefined,
-          });
-        }
-        return mapped;
+        return [] as GitHubIssueLite[]; // safety
       })
     );
 
@@ -75,5 +100,6 @@ export function createGithubAdapterFromEnv(): GithubAdapter {
   const token = (import.meta as any)?.env?.VITE_GITHUB_TOKEN ?? (typeof process !== 'undefined' ? process.env?.VITE_GITHUB_TOKEN : undefined);
   const perRepoLimitStr = (import.meta as any)?.env?.VITE_GITHUB_PER_REPO_LIMIT ?? (typeof process !== 'undefined' ? process.env?.VITE_GITHUB_PER_REPO_LIMIT : undefined);
   const perRepoLimit = perRepoLimitStr ? parseInt(String(perRepoLimitStr), 10) : undefined;
-  return new RealGithubAdapter({ token, perRepoLimit });
+  const cursor = (import.meta as any)?.env?.VITE_GITHUB_CURSOR ?? (typeof process !== 'undefined' ? process.env?.VITE_GITHUB_CURSOR : undefined);
+  return new RealGithubAdapter({ token, perRepoLimit, cursor });
 }
